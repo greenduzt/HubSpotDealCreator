@@ -10,7 +10,7 @@ namespace HubSpotDealCreator.Services
     {
         public static async Task<(object, StringBuilder, bool)> SearchCompanyName(StringBuilder transStringBuilder, string apiKey, object JSONList, object deal)
         {
-            // Implementation for searching company name
+            
             return (null, transStringBuilder, false);
         }
     }

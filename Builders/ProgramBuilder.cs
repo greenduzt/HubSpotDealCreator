@@ -2,6 +2,7 @@
 using HubSpotDealCreator.JSON;
 using HubSpotDealCreator.Models;
 using HubSpotDealCreator.Services;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,38 +20,42 @@ namespace HubSpotDealCreator.Builders
         {
             program = new Program();
         }
+
+        public IProgramBuilder SetConnectionString(string connectionString)
+        {
+            // Set the connection string
+            DBConfiguration.Initialize();
+
+            this.connectionString = connectionString;
+            return this;
+        }
+
         public IProgramBuilder GetSystemParameters()
         {
             program.systemParameters = DBAccess.GetSystemParameters();
             return this;
         }
 
-        public IProgramBuilder BuildHubSpotProducts()
+        public IProgramBuilder GetHubSpotProducts()
         {
             program.hubSpotProductList = DBAccess.LoadHubSpotProducts();
             return this;
         }
 
-        public IProgramBuilder UploadFile(string filePath, string apiKey)
+        public IProgramBuilder UploadFile(string fileName, IConfiguration config, List<SystemParameters> sp)
         {
-            program.constructedFileName = POUpload.UploadFile(filePath, apiKey);
+            program.constructedFileName = POUpload.UploadFile(fileName, config, sp);
             return this;
         }
                 
 
         public async Task<IProgramBuilder> CreateNewDeal(string apiKey, string constructedFileName)
         {
-            var (tempDeal, tempTransStringBuilder, dealCreated) = await CreateNewHBDeal.CreateNewDeal(program.transStringBuilder, apiKey, program.deal, constructedFileName);
-            program.deal = tempDeal;
-            program.transStringBuilder = tempTransStringBuilder;
+           
             return this;
         }
 
-        public IProgramBuilder SetConnectionString(string connectionString)
-        {
-            this.connectionString = connectionString;
-            return this;
-        }
+       
 
         public Program Build()
         {

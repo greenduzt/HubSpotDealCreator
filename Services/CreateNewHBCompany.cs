@@ -10,7 +10,7 @@ namespace HubSpotDealCreator.Services
     {
         public static async Task<(object, StringBuilder, bool)> CreateNewCompany(StringBuilder transStringBuilder, string apiKey, object deal)
         {
-            // Implementation for creating new company
+          
             return (null, transStringBuilder, false);
         }
     }

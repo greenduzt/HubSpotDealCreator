@@ -10,7 +10,7 @@ namespace HubSpotDealCreator.Services
     {
         public static async Task<(object, StringBuilder, bool)> CreateNewDeal(StringBuilder transStringBuilder, string apiKey, object deal, string constructedFileName)
         {
-            // Implementation for creating new deal
+          
             return (null, transStringBuilder, false);
         }
     }

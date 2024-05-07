@@ -15,22 +15,32 @@ public class Program
     public StringBuilder transStringBuilder;
     public bool companyFound;
     public bool isNewCompanyCreated;
-    public object deal; // Define the type of deal object
+    private static Deal deal; 
 
     public static async Task Main(string[] args)
     {
+       
         //Set up the config to load the user secrets
         IConfiguration config = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddUserSecrets<Program>(true)
             .Build();
 
-        Program program = new ProgramBuilder()
-            .SetConnectionString(DBConfiguration.GetConnectionString())
-            .GetSystemParameters()
-            .BuildHubSpotProducts()                                             
-            .Build(); 
-      
+        // Set the configuration for DBConfiguration
+        DBConfiguration.Config = config;
+
+        ProgramBuilder programBuilder = new ProgramBuilder();
+
+        Program program = programBuilder
+        .SetConnectionString(DBConfiguration.GetConnectionString())
+        .GetSystemParameters()
+        .GetHubSpotProducts()
+        .Build(); // Build the program instance here
+                
+        program = programBuilder
+            .UploadFile(deal.FileName, config, program.systemParameters) // Use the program instance here
+            .Build();
+
         await program.AddToHubSpot();
     }
 

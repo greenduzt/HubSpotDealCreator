@@ -26,6 +26,7 @@ namespace HubSpotDealCreator.Models
         public Company Company { get; set; }
 
         public string OrderNotes { get; set; }
+        public string FileName { get; set; }
 
         public List<LineItems> LineItems { get; set; }
     }

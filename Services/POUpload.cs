@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using HubSpotDealCreator.Models;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
@@ -11,18 +13,20 @@ namespace HubSpotDealCreator.Services
 {
     public static class POUpload
     {
-        public static string UploadFile(string fn, string key)
+        public static string UploadFile(string fn, IConfiguration config, List<SystemParameters> sp)
         {
+            var locStr = sp.FirstOrDefault(x => x.Type.Equals("po_location"));
 
+            string fileWithPath = locStr.AttchmentLocation + "/"+fn;
             string fileName = Path.GetFileName(fn);
 
-            string constructedFile = "";
+            string constructedFile = config["HubSpot-API:File-Upload-Location"];
 
-            var file = File.ReadAllBytes(fn);
+            var file = File.ReadAllBytes(fileWithPath);
             var client = new RestClient("https://api.hubapi.com/");
             var request = new RestRequest("/filemanager/api/v3/files/upload", Method.Post);
 
-            client.AddDefaultHeader("Authorization", string.Format("Bearer {0}", key));
+            client.AddDefaultHeader("Authorization", string.Format("Bearer {0}", config["HubSpot-API:Key"]));
 
             request.AddFile("file", file, fileName, "application/octet-stream");
 
