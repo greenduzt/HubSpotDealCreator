@@ -15,12 +15,17 @@ public class Program
     public StringBuilder transStringBuilder;
     public bool companyFound;
     public bool isNewCompanyCreated;
-    private static Deal deal; 
+    public Task<Dictionary<Deal, bool>> companyResult;
+    private static Deal deal;
 
     public static async Task Main(string[] args)
     {
-       
-        //Set up the config to load the user secrets
+
+        deal = new Deal();
+        deal.Company = new Company() { ABN = "61166259025",Name = "proone" };
+        deal.FileName = "Purchase_Order_No_42363.pdf";
+
+        // Set up the config to load the user secrets
         IConfiguration config = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddUserSecrets<Program>(true)
@@ -31,15 +36,20 @@ public class Program
 
         ProgramBuilder programBuilder = new ProgramBuilder();
 
-        Program program = programBuilder
-        .SetConnectionString(DBConfiguration.GetConnectionString())
-        .GetSystemParameters()
-        .GetHubSpotProducts()
-        .Build(); // Build the program instance here
-                
-        program = programBuilder
-            .UploadFile(deal.FileName, config, program.systemParameters) // Use the program instance here
-            .Build();
+        // Build the program instance here
+        IProgramBuilder programBuilderInstance = await programBuilder
+            .SetConnectionString(DBConfiguration.GetConnectionString())
+            .GetSystemParameters()
+            .GetHubSpotProducts()
+            .CheckCompanyExists(deal, config); // Correct placement of CheckCompanyExists
+
+        Program program = await programBuilderInstance.BuildAsync(); // Use BuildAsync
+
+        
+        // Upload file and check company existence
+        program = await programBuilderInstance
+            .UploadFile(deal.FileName, config, program.systemParameters)
+            .BuildAsync(); // Use BuildAsync directly
 
         await program.AddToHubSpot();
     }

@@ -21,6 +21,26 @@ namespace HubSpotDealCreator.Builders
             program = new Program();
         }
 
+        public async Task<Program> BuildAsync() // Modify to return Task<Program>
+        {
+            // Construct Program instance
+            Program program = new Program
+            {
+                systemParameters = await GetSystemParametersAsync()
+            };
+
+            // Additional initialization logic here...
+
+            return await Task.FromResult(program);
+        }
+
+        private async Task<List<SystemParameters>> GetSystemParametersAsync()
+        {
+            // Example asynchronous method to fetch system parameters from a database or external service
+            // Replace this with your actual implementation
+            return await DBAccess.GetSystemParametersAsync();
+        }
+
         public IProgramBuilder SetConnectionString(string connectionString)
         {
             // Set the connection string
@@ -55,7 +75,14 @@ namespace HubSpotDealCreator.Builders
             return this;
         }
 
-       
+        //Check if company name exists
+        public async Task<IProgramBuilder> CheckCompanyExists(Deal deal, IConfiguration config)
+        {
+            program.companyResult =  CheckHBCompanyName.SearchCompanyName(config["HubSpot-API:Key"], deal);
+
+            return this;
+        }
+
 
         public Program Build()
         {

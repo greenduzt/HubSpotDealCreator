@@ -12,8 +12,9 @@ namespace HubSpotDealCreator.Builders
     {
         IProgramBuilder GetSystemParameters();
         IProgramBuilder GetHubSpotProducts();
-        IProgramBuilder UploadFile(string fileName, IConfiguration config, List<SystemParameters> sp);                        
+        IProgramBuilder UploadFile(string fileName, IConfiguration config, List<SystemParameters> sp);
         IProgramBuilder SetConnectionString(string connectionString);
-        Program Build();
+        Task<IProgramBuilder> CheckCompanyExists(Deal deal, IConfiguration config);
+        Task<Program> BuildAsync();
     }
 }
