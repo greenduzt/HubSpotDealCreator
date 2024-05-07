@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "kuan0CYfPOGOMM5mskIZqiwTE4AiuCIa5j7BPGZI/oIH9nQ8sYUSLJaqfwhf/4XoR4eGDln/o7VyKaL0jW2Qyg==",
+  "dgSpecHash": "qJGQ+9U9yGvtIK+gqE7JukKuK6lpvooir+4JXO7SRk0L8TIFD/aXk6ZIy/1+EA65Li4cfE+xrjUum1VmtOFpxg==",
   "success": true,
   "projectFilePath": "D:\\Projects\\HubSpotDealCreator\\HubSpotDealCreator.csproj",
   "expectedPackageFiles": [
@@ -17,6 +17,8 @@
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
+    "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\restsharp\\110.2.0\\restsharp.110.2.0.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\runtime.native.system.data.sqlclient.sni\\4.7.0\\runtime.native.system.data.sqlclient.sni.4.7.0.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\runtime.win-x64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",

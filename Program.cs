@@ -1,4 +1,5 @@
 ﻿using Amazon.Textract.Model;
+using HubSpotDealCreator.Builders;
 using HubSpotDealCreator.DB;
 using HubSpotDealCreator.Models;
 using HubSpotDealCreator.Services;
@@ -7,6 +8,7 @@ using System.Text;
 
 public class Program
 {
+    public List<SystemParameters> systemParameters;
     public List<HubSpotProduct> hubSpotProductList;
     public List<ExpenseDocument> expenseDocumentsTemp;
     public string constructedFileName;
@@ -15,7 +17,7 @@ public class Program
     public bool isNewCompanyCreated;
     public object deal; // Define the type of deal object
 
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         //Set up the config to load the user secrets
         IConfiguration config = new ConfigurationBuilder()
@@ -23,14 +25,19 @@ public class Program
             .AddUserSecrets<Program>(true)
             .Build();
 
-        // Set the configuration in DBConfiguration
-        DBConfiguration.Config = config;
+        Program program = new ProgramBuilder()
+            .SetConnectionString(DBConfiguration.GetConnectionString())
+            .GetSystemParameters()
+            .BuildHubSpotProducts()                                             
+            .Build(); 
+      
+        await program.AddToHubSpot();
+    }
 
-        // Initialize DBConfiguration
-        DBConfiguration.Initialize();
-
-        HubSpotProductService productService = new HubSpotProductService();
-        List<HubSpotProduct> sp = productService.GetHubSpotProducts();
+    public async Task AddToHubSpot()
+    {
+        // Adding to HubSpot
+        await Task.Delay(0);
     }
 }
 

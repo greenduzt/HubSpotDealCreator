@@ -8,12 +8,9 @@ namespace HubSpotDealCreator.Builders
 {
     public interface IProgramBuilder
     {
+        IProgramBuilder GetSystemParameters();
         IProgramBuilder BuildHubSpotProducts();
-        IProgramBuilder UploadFile(string filePath, string apiKey);
-        IProgramBuilder GetPODetails();
-        IProgramBuilder SearchCompanyInfo(string apiKey);
-        IProgramBuilder CreateNewCompany(string apiKey);
-        IProgramBuilder CreateNewDeal(string apiKey, string constructedFileName);
+        IProgramBuilder UploadFile(string filePath, string apiKey);                        
         IProgramBuilder SetConnectionString(string connectionString);
         Program Build();
     }

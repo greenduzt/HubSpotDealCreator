@@ -34,3 +34,5 @@ D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.genruntimecon
 D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\ref\HubSpotDealCreator.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\AWSSDK.Core.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\AWSSDK.Textract.dll
+D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\Newtonsoft.Json.dll
+D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\RestSharp.dll
