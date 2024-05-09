@@ -8,6 +8,7 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        bool isCompanyFound = false;
         //Sample data
         Deal deal = new Deal();
         deal.Company = new Company() { ABN = "61166259025", Name = "proone" };
@@ -37,7 +38,7 @@ public class Program
 
         // Enqueue messages representing different actions
         messageQueue.Enqueue(new FileUploadMessage(attchLoc.AttchmentLocation + @"\" +deal.FileName ));
-        messageQueue.Enqueue(new CheckCompanyNameMessage());
+        messageQueue.Enqueue(new CheckCompanyNameMessage(deal,isCompanyFound));
 
         // Process messages asynchronously
         while (messageQueue.Count > 0)
@@ -65,28 +66,26 @@ public class Program
                 break;
 
             case CheckCompanyNameMessage checkCompanyNameMessage:
-                await HandleGetDataAsync(checkCompanyNameMessage, config);
+                await HandleCheckCompanyNameAsync(checkCompanyNameMessage, config);
                 break;
 
                 
         }
-    }
-
-    static async Task HandleGetDataAsync(CheckCompanyNameMessage message, IConfiguration config)
-    {
-        // Retrieve data asynchronously
-        //var expenseDocumentsTemp = Data.GetData();
-
-        // Enqueue next message or perform further processing
-        // messageQueue.Enqueue(new NextMessage());
-    }
+    }    
 
     static async Task HandleFileUploadAsync(FileUploadMessage message, IConfiguration config)
     {
         // Perform file upload asynchronously
-        string constructedFileName = POUpload.UploadFile(message.FilePath, config);
+        //string constructedFileName = POUpload.UploadFile(message.FilePath, config);
 
-        // Enqueue next message or perform further processing
+        // messageQueue.Enqueue(new NextMessage());
+    }
+
+    static async Task HandleCheckCompanyNameAsync(CheckCompanyNameMessage message, IConfiguration config)
+    {
+        // Check the company name asynchronously
+        var (deal, cf) = await CheckHBCompanyName.SearchCompanyName(message.Deal, config);
+
         // messageQueue.Enqueue(new NextMessage());
     }
 
