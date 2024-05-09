@@ -88,40 +88,6 @@ namespace HubSpotDealCreator.DB
 
             return systemParameters;
         }
-
-        public static async Task<List<SystemParameters>> GetSystemParametersAsync()
-        {
-            List<SystemParameters> systemParameters = new List<SystemParameters>();
-
-            // Create a SqlConnection object
-            using (SqlConnection conn = new SqlConnection(DBConfiguration.GetConnectionString()))
-            {
-                try
-                {
-                    await conn.OpenAsync(); // Asynchronously open the connection
-
-                    using (SqlCommand command = new SqlCommand("SELECT * FROM SystemParameters", conn))
-                    {
-                        using (SqlDataReader reader = await command.ExecuteReaderAsync()) // Asynchronously execute the query
-                        {
-                            while (await reader.ReadAsync()) // Asynchronously read each row
-                            {
-                                SystemParameters sp = new SystemParameters();
-                                sp.Type = reader["type"].ToString();
-                                sp.AttchmentLocation = reader["attachment_location"].ToString();
-                                systemParameters.Add(sp);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-
-            return systemParameters;
-        }
-
+       
     }
 }

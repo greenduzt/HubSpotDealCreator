@@ -1,28 +1,16 @@
-﻿using Amazon.Textract.Model;
-using HubSpotDealCreator.Builders;
-using HubSpotDealCreator.DB;
+﻿using HubSpotDealCreator.DB;
+using HubSpotDealCreator.Message;
 using HubSpotDealCreator.Models;
 using HubSpotDealCreator.Services;
 using Microsoft.Extensions.Configuration;
-using System.Text;
 
 public class Program
 {
-    public List<SystemParameters> systemParameters;
-    public List<HubSpotProduct> hubSpotProductList;
-    public List<ExpenseDocument> expenseDocumentsTemp;
-    public string constructedFileName;
-    public StringBuilder transStringBuilder;
-    public bool companyFound;
-    public bool isNewCompanyCreated;
-    public Task<Dictionary<Deal, bool>> companyResult;
-    private static Deal deal;
-
     public static async Task Main(string[] args)
     {
-
-        deal = new Deal();
-        deal.Company = new Company() { ABN = "61166259025",Name = "proone" };
+        //Sample data
+        Deal deal = new Deal();
+        deal.Company = new Company() { ABN = "61166259025", Name = "proone" };
         deal.FileName = "Purchase_Order_No_42363.pdf";
 
         // Set up the config to load the user secrets
@@ -33,31 +21,74 @@ public class Program
 
         // Set the configuration for DBConfiguration
         DBConfiguration.Config = config;
+        // Set the connection string
+        DBConfiguration.Initialize();
 
-        ProgramBuilder programBuilder = new ProgramBuilder();
+        // Load HubSpot products
+        List<HubSpotProduct> hubSpotProductList = DBAccess.LoadHubSpotProducts();
 
-        // Build the program instance here
-        IProgramBuilder programBuilderInstance = await programBuilder
-            .SetConnectionString(DBConfiguration.GetConnectionString())
-            .GetSystemParameters()
-            .GetHubSpotProducts()
-            .CheckCompanyExists(deal, config); // Correct placement of CheckCompanyExists
+        // Get system parameters
+        List<SystemParameters> systemParameters = DBAccess.GetSystemParameters();
 
-        Program program = await programBuilderInstance.BuildAsync(); // Use BuildAsync
+        var attchLoc = systemParameters.FirstOrDefault(x=>x.Type.Equals("po_location"));
 
-        
-        // Upload file and check company existence
-        program = await programBuilderInstance
-            .UploadFile(deal.FileName, config, program.systemParameters)
-            .BuildAsync(); // Use BuildAsync directly
+        // Initialize message queue
+        var messageQueue = new Queue<Message>();
 
-        await program.AddToHubSpot();
+        // Enqueue messages representing different actions
+        messageQueue.Enqueue(new FileUploadMessage(attchLoc.AttchmentLocation + @"\" +deal.FileName ));
+        messageQueue.Enqueue(new CheckCompanyNameMessage());
+
+        // Process messages asynchronously
+        while (messageQueue.Count > 0)
+        {
+            var message = messageQueue.Dequeue();
+
+            try
+            {
+                await ProcessMessageAsync(message, config);
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions gracefully and log errors
+                Console.WriteLine($"Error processing message: {ex.Message}");
+            }
+        }
     }
 
-    public async Task AddToHubSpot()
+    static async Task ProcessMessageAsync(Message message, IConfiguration config)
     {
-        // Adding to HubSpot
-        await Task.Delay(0);
+        switch (message)
+        {
+            case FileUploadMessage fileUploadMessage:
+                await HandleFileUploadAsync(fileUploadMessage, config);
+                break;
+
+            case CheckCompanyNameMessage checkCompanyNameMessage:
+                await HandleGetDataAsync(checkCompanyNameMessage, config);
+                break;
+
+                
+        }
     }
+
+    static async Task HandleGetDataAsync(CheckCompanyNameMessage message, IConfiguration config)
+    {
+        // Retrieve data asynchronously
+        //var expenseDocumentsTemp = Data.GetData();
+
+        // Enqueue next message or perform further processing
+        // messageQueue.Enqueue(new NextMessage());
+    }
+
+    static async Task HandleFileUploadAsync(FileUploadMessage message, IConfiguration config)
+    {
+        // Perform file upload asynchronously
+        string constructedFileName = POUpload.UploadFile(message.FilePath, config);
+
+        // Enqueue next message or perform further processing
+        // messageQueue.Enqueue(new NextMessage());
+    }
+
 }
 
