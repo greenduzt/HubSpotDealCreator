@@ -1,93 +1,84 @@
 ﻿using HubSpotDealCreator.DB;
-using HubSpotDealCreator.Message;
+using HubSpotDealCreator.Handlers;
 using HubSpotDealCreator.Models;
-using HubSpotDealCreator.Services;
 using Microsoft.Extensions.Configuration;
 
 public class Program
 {
     public static async Task Main(string[] args)
-    {
-        bool isCompanyFound = false;
-        //Sample data
-        Deal deal = new Deal();
-        deal.Company = new Company() { ABN = "61166259025", Name = "proone" };
-        deal.FileName = "Purchase_Order_No_42363.pdf";
+    {       
+        // Set up configuration
+        IConfiguration config = Configure();
 
+        // Initialize database configuration
+        InitializeDatabase(config);
+
+        // Load necessary data
+        var (hubSpotProductList, systemParameters) = LoadData();
+
+        // Prepare sample data
+        Deal deal = PrepareDeal();
+
+        // Create handlers for sequential checks
+        var companyNameHandler = new CompanyNameSearchHandler();
+        var domainHandler = new DomainSearchHandler();
+        var abnHandler = new AbnSearchHandler();
+        var companyCreationHandler = new CompanyCreationHandler();
+
+        // Set up chain of responsibility
+         companyNameHandler.SetNext(domainHandler).SetNext(abnHandler).SetNext(companyCreationHandler);
+                                             
+
+        // Initiate search process
+        var (finalDeal, isFound) = await companyNameHandler.SearchAsync(deal, config);
+
+        // Finally, create line items and deal if required
+        if (finalDeal.CompanyFound || finalDeal.DomainFound || finalDeal.AbnFound || finalDeal.newCompanyCreated)
+        {
+        //    await CreateLineItemsAndDeal(apiKey, finalDeal);
+        }
+    }
+
+    static IConfiguration Configure()
+    {
         // Set up the config to load the user secrets
-        IConfiguration config = new ConfigurationBuilder()
+        return new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddUserSecrets<Program>(true)
             .Build();
+    }
 
+    static void InitializeDatabase(IConfiguration config)
+    {
         // Set the configuration for DBConfiguration
         DBConfiguration.Config = config;
+
         // Set the connection string
         DBConfiguration.Initialize();
+    }
 
+    static (List<HubSpotProduct>, List<SystemParameters>) LoadData()
+    {
         // Load HubSpot products
-        List<HubSpotProduct> hubSpotProductList = DBAccess.LoadHubSpotProducts();
+        var hubSpotProductList = DBAccess.LoadHubSpotProducts();
 
         // Get system parameters
-        List<SystemParameters> systemParameters = DBAccess.GetSystemParameters();
+        var systemParameters = DBAccess.GetSystemParameters();
 
-        var attchLoc = systemParameters.FirstOrDefault(x=>x.Type.Equals("po_location"));
+        return (hubSpotProductList, systemParameters);
+    }
 
-        // Initialize message queue
-        var messageQueue = new Queue<Message>();
-
-        // Enqueue messages representing different actions
-        messageQueue.Enqueue(new FileUploadMessage(attchLoc.AttchmentLocation + @"\" +deal.FileName ));
-        messageQueue.Enqueue(new CheckCompanyNameMessage(deal,isCompanyFound));
-
-        // Process messages asynchronously
-        while (messageQueue.Count > 0)
+    static Deal PrepareDeal()
+    {
+        // Prepare sample data
+        return new Deal
         {
-            var message = messageQueue.Dequeue();
-
-            try
-            {
-                await ProcessMessageAsync(message, config);
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions gracefully and log errors
-                Console.WriteLine($"Error processing message: {ex.Message}");
-            }
-        }
+            Company = new Company { ABN = "61166259025", Name = "proone" },
+            FileName = "Purchase_Order_No_42363.pdf"
+        };
     }
 
-    static async Task ProcessMessageAsync(Message message, IConfiguration config)
-    {
-        switch (message)
-        {
-            case FileUploadMessage fileUploadMessage:
-                await HandleFileUploadAsync(fileUploadMessage, config);
-                break;
-
-            case CheckCompanyNameMessage checkCompanyNameMessage:
-                await HandleCheckCompanyNameAsync(checkCompanyNameMessage, config);
-                break;
-
-                
-        }
-    }    
-
-    static async Task HandleFileUploadAsync(FileUploadMessage message, IConfiguration config)
-    {
-        // Perform file upload asynchronously
-        //string constructedFileName = POUpload.UploadFile(message.FilePath, config);
-
-        // messageQueue.Enqueue(new NextMessage());
-    }
-
-    static async Task HandleCheckCompanyNameAsync(CheckCompanyNameMessage message, IConfiguration config)
-    {
-        // Check the company name asynchronously
-        var (deal, cf) = await CheckHBCompanyName.SearchCompanyName(message.Deal, config);
-
-        // messageQueue.Enqueue(new NextMessage());
-    }
+    
 
 }
 

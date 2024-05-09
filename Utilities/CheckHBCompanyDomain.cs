@@ -6,12 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HubSpotDealCreator.Services
+namespace HubSpotDealCreator.Utilities
 {
-    public static class CheckHBCompanyName
+    public static class CheckHBCompanyDomain
     {
-        public static async Task<(Deal deal, bool isCompanyFound)> SearchCompanyName(Deal deal, IConfiguration config)
+        public static async Task<(Deal deal, bool isDomainFound)> SearchDomain(Deal deal, IConfiguration config)
         {
+            bool isDomainFound = false;
             using (HttpClient client = new HttpClient())
             {
                 string json = @"{
@@ -20,8 +21,8 @@ namespace HubSpotDealCreator.Services
                             ""filters"": [
                                 {
                                     ""operator"": ""EQ"",
-                                    ""propertyName"": ""name"",
-                                    ""value"": """ + deal.Company.Name + @"""                                    
+                                    ""propertyName"": ""domain"",
+                                    ""value"": """ + deal.Company.Domain + @"""
                                 }
                             ]
                         }
@@ -29,53 +30,47 @@ namespace HubSpotDealCreator.Services
                     ""properties"": [""abn"",""name"",""domain"",""customer_type""]
                 }";
 
-                bool isCompanyFound = false;
                 // Set the authorization header with the API key
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {config["HubSpot-API:Key"]}");
 
-                // Create the content for the POST request for searching by name
-                var contentByName = new StringContent(json, Encoding.UTF8, "application/json");
-
+                var contentByDomain = new StringContent(json, Encoding.UTF8, "application/json");
                 // Make the POST request to search for the company by name
-                HttpResponseMessage responseByName = await client.PostAsync("https://api.hubapi.com/crm/v3/objects/companies/search", contentByName);
-
-                /**********CHECKING COMPANY NAME***********/
-                if (responseByName.IsSuccessStatusCode)
+                HttpResponseMessage responseByDomain = await client.PostAsync("https://api.hubapi.com/crm/v3/objects/companies/search", contentByDomain);
+                if (responseByDomain.IsSuccessStatusCode)
                 {
                     // Read the response content as a string
-                    string responseNameBody = await responseByName.Content.ReadAsStringAsync();
+                    string responseDomainBody = await responseByDomain.Content.ReadAsStringAsync();
 
                     // Deserialize the JSON response
-                    dynamic jsonNameResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(responseNameBody);
-
+                    dynamic jsonDomainResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(responseDomainBody);
                     // Extract the results
-                    int count = jsonNameResponse.total;
-                    dynamic[] results = jsonNameResponse.results.ToObject<dynamic[]>();
-
+                    int count = jsonDomainResponse.total;
+                    dynamic[] results = jsonDomainResponse.results.ToObject<dynamic[]>();
                     // Display the results
                     Console.WriteLine($"Total companies found: {count}");
                     if (count > 0)
                     {
-                        dynamic result = jsonNameResponse.results[0];
+                        dynamic result = jsonDomainResponse.results[0];
                         deal.Company.CompanyID = result.id;
                         deal.Company.Name = result.properties.name;
                         deal.Company.Domain = result.properties.domain;
                         deal.Company.ABN = result.properties.abn;
                         deal.Company.CustomerType = result.properties.customer_type;
-                        isCompanyFound = true;
+
+                        isDomainFound = true;
                     }
                     else
                     {
-                        isCompanyFound = false;
+                        isDomainFound = false;
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Error searching by name. Status code: {responseByName.StatusCode}");
+                    Console.WriteLine($"Error searching by domain. Status code: {responseByDomain.StatusCode}");
                 }
-
-                return (deal, isCompanyFound);
             }
+
+            return (deal,  isDomainFound);
         }
     }
 }
