@@ -24,6 +24,12 @@ namespace HubSpotDealCreator.Handlers
             deal = tempDeal;
             deal.DomainFound = domainFound;
 
+            // If domain is found, return without passing to the next handler
+            if (domainFound)
+            {
+                return (deal, true);
+            }
+            // Pass to the next handler
             return _nextHandler != null ? await _nextHandler.HandleAsync(deal, config) : (deal, false);
         }
     }

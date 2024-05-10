@@ -1,6 +1,7 @@
 ﻿using HubSpotDealCreator.DB;
 using HubSpotDealCreator.Handlers;
 using HubSpotDealCreator.Models;
+using HubSpotDealCreator.Utilities;
 using Microsoft.Extensions.Configuration;
 
 public class Program
@@ -24,38 +25,28 @@ public class Program
         var domainHandler = new DomainSearchHandler();
         var abnHandler = new AbnSearchHandler();
         var companyCreationHandler = new CompanyCreationHandler();
+        var createDeal = new DealCreationHandler();
 
         // Set up chain of responsibility
-         companyNameHandler.SetNext(domainHandler).SetNext(abnHandler).SetNext(companyCreationHandler);
+         companyNameHandler.SetNext(domainHandler).SetNext(abnHandler).SetNext(companyCreationHandler).SetNext(createDeal);
                                              
 
         // Initiate search process
         var (finalDeal, isFound) = await companyNameHandler.HandleAsync(deal, config);
 
         // Finally, create line items and deal if required
-        if (finalDeal.CompanyFound || finalDeal.DomainFound || finalDeal.AbnFound || finalDeal.newCompanyCreated)
+        if (isFound)
         {
-        //    await CreateLineItemsAndDeal(apiKey, finalDeal);
+            await CreateLineItemsAndDeal.CreateNewDeal(finalDeal, config);
         }
     }
 
-    static IConfiguration Configure()
-    {
-        // Set up the config to load the user secrets
-        return new ConfigurationBuilder()
+    //Load the configuration file
+    static IConfiguration Configure() =>
+        new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddUserSecrets<Program>(true)
             .Build();
-    }
-
-    static void InitializeDatabase(IConfiguration config)
-    {
-        // Set the configuration for DBConfiguration
-        DBConfiguration.Config = config;
-
-        // Set the connection string
-        DBConfiguration.Initialize();
-    }
 
     static (List<HubSpotProduct>, List<SystemParameters>) LoadData()
     {
@@ -68,15 +59,21 @@ public class Program
         return (hubSpotProductList, systemParameters);
     }
 
-    static Deal PrepareDeal()
+    static void InitializeDatabase(IConfiguration config)
     {
-        // Prepare sample data
-        return new Deal
-        {
-            Company = new Company { ABN = "61166259025", Name = "proone", Domain = "www.proone.com.au" },
-            FileName = "Purchase_Order_No_42363.pdf"
-        };
+        DBConfiguration.Config = config;
+        DBConfiguration.Initialize();
+    
     }
+
+    // Prepare sample data
+    static Deal PrepareDeal() => new Deal
+        {
+            Company = new Company { ABN = "61166259025", Name = "gfhfh", Domain = "www.proone.com.au" },
+            DeliveryAddress = new Address(),
+            FileName = "Purchase_Order_No_42363.pdf",
+            LineItems = new List<LineItems>() { new LineItems { SKU = "SY14G",Name = "Sand Yellow 1-4mm",Quantity = 80,UnitPrice = 2.05,NetPrice = 164 } }            
+        };   
 
     
 

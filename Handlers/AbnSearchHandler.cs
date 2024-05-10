@@ -24,6 +24,12 @@ namespace HubSpotDealCreator.Handlers
             deal = tempDeal;
             deal.AbnFound = abnFound;
 
+            // If ABN is found, return without passing to the next handler
+            if (abnFound)
+            {
+                return (deal, true);
+            }
+            // Pass to the next handler
             return _nextHandler != null ? await _nextHandler.HandleAsync(deal, config) : (deal, false);
         }
     }
