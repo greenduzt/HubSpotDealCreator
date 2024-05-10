@@ -1,8 +1,3 @@
-D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.csproj.AssemblyReference.cache
-D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.GeneratedMSBuildEditorConfig.editorconfig
-D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.AssemblyInfoInputs.cache
-D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.AssemblyInfo.cs
-D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.csproj.CoreCompileInputs.cache
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\HubSpotDealCreator.exe
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\HubSpotDealCreator.deps.json
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\HubSpotDealCreator.runtimeconfig.json
@@ -30,6 +25,11 @@ D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\runtimes\win-x86\native\sni.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
+D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.csproj.AssemblyReference.cache
+D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.AssemblyInfoInputs.cache
+D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.AssemblyInfo.cs
+D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.csproj.CoreCompileInputs.cache
 D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.csproj.CopyComplete
 D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.dll
 D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\refint\HubSpotDealCreator.dll

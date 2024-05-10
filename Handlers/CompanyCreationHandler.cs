@@ -22,7 +22,7 @@ namespace HubSpotDealCreator.Handlers
             deal.newCompanyCreated = companyCreated;                           
 
             // Return the deal and whether a new company was created
-            return (deal, companyCreated);
+            return _nextHandler != null ? await _nextHandler.HandleAsync(deal, config) : (deal, false);
         }
     }
 }

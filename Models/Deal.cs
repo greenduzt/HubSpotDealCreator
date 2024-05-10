@@ -24,5 +24,6 @@ namespace HubSpotDealCreator.Models
         public bool DomainFound { get; set; }
         public bool AbnFound { get; set; }
         public bool newCompanyCreated { get; set; }
+        public bool FileUploaded { get; set; }
     }
 }

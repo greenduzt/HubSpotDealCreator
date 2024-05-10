@@ -25,10 +25,15 @@ public class Program
         var domainHandler = new DomainSearchHandler();
         var abnHandler = new AbnSearchHandler();
         var companyCreationHandler = new CompanyCreationHandler();
+        var purchasOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
         var createDeal = new DealCreationHandler();
 
         // Set up chain of responsibility
-         companyNameHandler.SetNext(domainHandler).SetNext(abnHandler).SetNext(companyCreationHandler).SetNext(createDeal);
+         companyNameHandler.SetNext(domainHandler)
+            .SetNext(abnHandler)
+            .SetNext(companyCreationHandler)
+            .SetNext(purchasOrderUploadHandler)
+            .SetNext(createDeal);
                                              
 
         // Initiate search process
