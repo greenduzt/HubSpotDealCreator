@@ -9,31 +9,22 @@ using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.Handlers
 {
-    public class CompanyNameSearchHandler : ICompanySearchHandler
-    {
-        private ICompanySearchHandler _nextHandler;
+    public class CompanyNameSearchHandler : AbstractCompanyHandler
+    {       
 
-        public ICompanySearchHandler SetNext(ICompanySearchHandler handler)
+        public override async Task<(Deal, bool)> HandleAsync(Deal deal, IConfiguration config)
         {
-            _nextHandler = handler;
-            return handler;
-        }
-
-        public async Task<(Deal, bool)> SearchAsync(Deal deal, IConfiguration config)
-        {
-            // Search company by name
-            if (!string.IsNullOrWhiteSpace(deal.Company.Name))
+            // If company name is null, pass to the next handler
+            if (string.IsNullOrWhiteSpace(deal.Company.Name) && _nextHandler != null)
             {
-                var (tempDeal, isCompanyFound) = await CheckHBCompanyName.SearchCompanyName(deal, config);
-                deal = tempDeal;
-                deal.CompanyFound = isCompanyFound;
-                if (isCompanyFound)
-                {
-                    return (deal, true);
-                }
+                return await _nextHandler.HandleAsync(deal, config);
             }
 
-            return _nextHandler != null ? await _nextHandler.SearchAsync(deal, config) : (deal, false);
+            var (tempDeal, isCompanyFound) = await CheckHBCompanyName.SearchCompanyName(deal, config);
+            deal = tempDeal;
+            deal.CompanyFound = isCompanyFound;
+
+            return _nextHandler != null ? await _nextHandler.HandleAsync(deal, config) : (deal, false);
         }
     }
 }

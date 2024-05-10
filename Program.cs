@@ -30,7 +30,7 @@ public class Program
                                              
 
         // Initiate search process
-        var (finalDeal, isFound) = await companyNameHandler.SearchAsync(deal, config);
+        var (finalDeal, isFound) = await companyNameHandler.HandleAsync(deal, config);
 
         // Finally, create line items and deal if required
         if (finalDeal.CompanyFound || finalDeal.DomainFound || finalDeal.AbnFound || finalDeal.newCompanyCreated)
@@ -73,7 +73,7 @@ public class Program
         // Prepare sample data
         return new Deal
         {
-            Company = new Company { ABN = "61166259025", Name = "proone" },
+            Company = new Company { ABN = "61166259025", Name = "proone", Domain = "www.proone.com.au" },
             FileName = "Purchase_Order_No_42363.pdf"
         };
     }

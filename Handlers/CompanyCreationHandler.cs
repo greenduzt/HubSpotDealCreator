@@ -9,17 +9,9 @@ using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.Handlers
 {
-    public class CompanyCreationHandler : ICompanySearchHandler
-    {
-        private ICompanySearchHandler nextHandler;
-
-        public ICompanySearchHandler SetNext(ICompanySearchHandler handler)
-        {
-            nextHandler = handler;
-            return handler;
-        }
-
-        public async Task<(Deal, bool)> SearchAsync(Deal deal, IConfiguration config)
+    public class CompanyCreationHandler : AbstractCompanyHandler
+    { 
+        public override async Task<(Deal, bool)> HandleAsync(Deal deal, IConfiguration config)
         {
             bool isNewCompanyCreated = false;
 
@@ -32,13 +24,19 @@ namespace HubSpotDealCreator.Handlers
                 var (tempDeal,  companyCreated) = await CreateNewHBCompany.CreateNewCompany(deal, config);
                 deal = tempDeal;
                 isNewCompanyCreated = companyCreated;
+                deal.newCompanyCreated = companyCreated;
+
+                // If a new company was created, set isFound to true
+                if (isNewCompanyCreated)
+                {
+                    return (deal, true);
+                }
             }
 
-
             // Pass to the next handler if available
-            if (!isNewCompanyCreated && nextHandler != null)
+            if (!isNewCompanyCreated && _nextHandler != null)
             {
-                return await nextHandler.SearchAsync(deal, config);
+                return await _nextHandler.HandleAsync(deal, config);
             }
 
             // Return the deal and whether a new company was created
