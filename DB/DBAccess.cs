@@ -87,7 +87,6 @@ namespace HubSpotDealCreator.DB
             }
 
             return systemParameters;
-        }
-       
+        }       
     }
 }
