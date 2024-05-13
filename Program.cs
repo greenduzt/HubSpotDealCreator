@@ -3,6 +3,8 @@ using HubSpotDealCreator.Handlers;
 using HubSpotDealCreator.Models;
 using HubSpotDealCreator.Utilities;
 using Microsoft.Extensions.Configuration;
+using Serilog.Events;
+using Serilog;
 
 public class Program
 {
@@ -11,38 +13,56 @@ public class Program
         // Set up configuration
         IConfiguration config = Configure();
 
-        // Initialize database configuration
-        InitializeDatabase(config);
-
-        // Load necessary data
-        var (hubSpotProductList, systemParameters) = LoadData();
-
-        // Prepare sample data
-        Deal deal = PrepareDeal();
-
-        // Create handlers for sequential checks
-        var companyNameHandler = new CompanyNameSearchHandler();
-        var domainHandler = new DomainSearchHandler();
-        var abnHandler = new AbnSearchHandler();
-        var companyCreationHandler = new CompanyCreationHandler();
-        var purchasOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
-        var createDeal = new DealCreationHandler();
-
-        // Set up chain of responsibility
-         companyNameHandler.SetNext(domainHandler)
-            .SetNext(abnHandler)
-            .SetNext(companyCreationHandler)
-            .SetNext(purchasOrderUploadHandler)
-            .SetNext(createDeal);
-                                             
-
-        // Initiate search process
-        var (finalDeal, isFound) = await companyNameHandler.HandleAsync(deal, config);
-
-        // Finally, create line items and deal if required
-        if (isFound)
+        Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug() // Set minimum log level to Debug
+                .WriteTo.File(config["Logging:Path"], // Specify file name
+                    rollingInterval: RollingInterval.Day, // Specify rolling interval
+                    restrictedToMinimumLevel: LogEventLevel.Debug) // Specify minimum log level
+                .CreateLogger();
+        try
         {
-            await CreateLineItemsAndDeal.CreateNewDeal(finalDeal, config);
+            // Initialize database configuration
+            InitializeDatabase(config);
+
+            // Load necessary data
+            var (hubSpotProductList, systemParameters) = LoadData();
+
+            // Prepare sample data
+            Deal deal = PrepareDeal();
+
+            // Create handlers for sequential checks
+            var companyNameHandler = new CompanyNameSearchHandler();
+            var domainHandler = new DomainSearchHandler();
+            var abnHandler = new AbnSearchHandler();
+            var companyCreationHandler = new CompanyCreationHandler();
+            var purchasOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
+            var createDeal = new DealCreationHandler();
+
+            // Set up chain of responsibility
+             companyNameHandler.SetNext(domainHandler)
+                .SetNext(abnHandler)
+                .SetNext(companyCreationHandler)
+                .SetNext(purchasOrderUploadHandler)
+                .SetNext(createDeal);                                             
+
+            // Initiate search process
+            var (finalDeal, isFound) = await companyNameHandler.HandleAsync(deal, config);
+
+            // Finally, create line items and deal if required
+            if (isFound)
+            {
+                await CreateLineItemsAndDeal.CreateNewDeal(finalDeal, config);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log any unhandled exceptions
+            Log.Error(ex, "An unhandled exception occurred");
+        }
+        finally
+        {
+            // Close and flush the Serilog logger
+            Log.CloseAndFlush();
         }
     }
 
