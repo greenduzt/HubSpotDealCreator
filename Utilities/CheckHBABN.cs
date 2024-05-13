@@ -25,7 +25,6 @@ namespace HubSpotDealCreator.Utilities
 
             try
             {
-
                 string json = @"{
                     ""filterGroups"": [
                         {
