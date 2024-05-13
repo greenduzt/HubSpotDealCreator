@@ -1,5 +1,7 @@
-﻿using HubSpotDealCreator.Models;
+﻿using Amazon.Runtime.Internal.Util;
+using HubSpotDealCreator.Models;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,11 @@ namespace HubSpotDealCreator.Utilities
     {
         public static async Task<(Deal deal,bool isCompanyFound)> SearchCompanyName(Deal deal, IConfiguration config)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File(config["Logging:Path"], rollingInterval:RollingInterval.Day, restrictedToMinimumLevel:Serilog.Events.LogEventLevel.Debug)    
+                .CreateLogger();
+
             using (HttpClient client = new HttpClient())
             {
                 string json = @"{
@@ -38,6 +45,8 @@ namespace HubSpotDealCreator.Utilities
                 // Make the POST request to search for the company by name
                 HttpResponseMessage responseByName = await client.PostAsync("https://api.hubapi.com/crm/v3/objects/companies/search", contentByName);
 
+                Log.Debug($"SearchCompanyName request made for company name: {deal.Company.Name}");
+
                 /**********CHECKING COMPANY NAME***********/
                 if (responseByName.IsSuccessStatusCode)
                 {
@@ -52,7 +61,7 @@ namespace HubSpotDealCreator.Utilities
                     dynamic[] results = jsonNameResponse.results.ToObject<dynamic[]>();
 
                     // Display the results
-                    Console.WriteLine($"Total companies found: {count}");
+                    Log.Information($"Total companies found for {deal.Company.Name}: {count}");
                     if (count > 0)
                     {
                         dynamic result = jsonNameResponse.results[0];
@@ -62,6 +71,8 @@ namespace HubSpotDealCreator.Utilities
                         deal.Company.ABN = result.properties.abn;
                         deal.Company.CustomerType = result.properties.customer_type;
                         isCompanyFound = true;
+                        Log.Debug($"Company details: ID: {deal.Company.CompanyID}, Name: {deal.Company.Name}, Domain: {deal.Company.Domain}, ABN: {deal.Company.ABN}, CustomerType: {deal.Company.CustomerType}");
+
                     }
                     else
                     {
@@ -70,7 +81,7 @@ namespace HubSpotDealCreator.Utilities
                 }
                 else
                 {
-                    Console.WriteLine($"Error searching by name. Status code: {responseByName.StatusCode}");
+                    Log.Error($"Error searching by name for company: {deal.Company.Name}. Status code: {responseByName.StatusCode}");
                 }
 
                 return (deal, isCompanyFound);

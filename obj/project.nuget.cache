@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "bM5cBlOWKQS92WFkPtyv5GnKFCX/MljJlkQj0K5ERtS7M9o4UZwOwpXkok5TrUXsqqYSJQ74cFxdqiUDuyt+Aw==",
+  "dgSpecHash": "qqiIUp9CxCN7HfqeybYyJGu1HrWHM2A+JAbVKOLLxikiwIdlVegY/OFPPhMY72fYvbwT3+FZhtUyE3qmEDeGEA==",
   "success": true,
   "projectFilePath": "D:\\Projects\\HubSpotDealCreator\\HubSpotDealCreator.csproj",
   "expectedPackageFiles": [
@@ -24,6 +24,7 @@
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\runtime.win-x64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\runtime.win-x86.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x86.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\serilog\\3.1.1\\serilog.3.1.1.nupkg.sha512",
+    "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\serilog.sinks.file\\5.0.0\\serilog.sinks.file.5.0.0.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\system.data.sqlclient\\4.8.6\\system.data.sqlclient.4.8.6.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\Chamara.Walaiyadde\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
