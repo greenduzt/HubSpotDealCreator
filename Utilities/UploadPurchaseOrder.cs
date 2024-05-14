@@ -8,65 +8,87 @@ using System.Text;
 using System.Threading.Tasks;
 using HubSpotDealCreator.Models;
 using Microsoft.Extensions.Configuration;
+using Serilog;
+using Serilog.Events;
 
 namespace HubSpotDealCreator.Utilities
 {
     public static class UploadPurchaseOrder
     {
-        public static (Deal,string,bool) UploadFile(Deal deal, IConfiguration config, List<SystemParameters> systemParameters)
+        public static Deal UploadFile(Deal deal, IConfiguration config, List<SystemParameters> systemParameters)
         {
             bool fileCreated = false;
+            string constructedFile = string.Empty;
 
-            var filePath = systemParameters.FirstOrDefault(x=>x.Type.Equals("po_location"));
+            Log.Logger = new LoggerConfiguration()
+               .MinimumLevel.Debug()
+               .WriteTo.File(config["Logging:Path"],
+                   rollingInterval: RollingInterval.Day,
+                   restrictedToMinimumLevel: LogEventLevel.Debug, 
+                   shared: true)
+               .CreateLogger();
 
-            string fileName = Path.GetFileName(filePath.AttchmentLocation + @"\" + deal.FileName);
-
-            string constructedFile = config["HubSpot-API:File-Upload-Location"];
-
-            var file = File.ReadAllBytes(filePath.AttchmentLocation + @"\" + fileName);
-            var client = new RestClient("https://api.hubapi.com/");
-            var request = new RestRequest("/filemanager/api/v3/files/upload", Method.Post);
-            
-            client.AddDefaultHeader("Authorization", string.Format("Bearer {0}", config["HubSpot-API:Key"]));
-
-            request.AddFile("file", file, fileName, "application/octet-stream");
-
-            request.AddParameter("folderPath", "/PO");
-
-            var fileOptions = new
+            try
             {
-                access = @"PUBLIC_NOT_INDEXABLE",
-            };
-            //Tranform it to Json object
-            string jsonData = JsonConvert.SerializeObject(fileOptions);
-            request.AddParameter("options", jsonData);
+                var filePath = systemParameters.FirstOrDefault(x => x.Type.Equals("po_location"));
+                string fileName = Path.GetFileName(filePath.AttchmentLocation + @"\" + deal.FileName);
 
-            var response = client.Execute(request);
-            if (response.IsSuccessStatusCode)
-            {
-                StringBuilder sb = new StringBuilder();
+                // Check if deal.FileName is null
+                if (string.IsNullOrWhiteSpace(deal.FileName))
+                {
+                    Log.Information("Deal file name is not available.");
+                    return deal;
+                }
 
-                JObject jsonResponse = JObject.Parse(response.Content);
-                string uploadedFileName = jsonResponse["objects"][0]["name"].ToString();
-                //constructedFile = constructedFile + uploadedFileName.Replace(" ", "%20");
+                var file = File.ReadAllBytes(filePath.AttchmentLocation + @"\" + fileName);
+                var client = new RestClient("https://api.hubapi.com/");
+                var request = new RestRequest("/filemanager/api/v3/files/upload", Method.Post);
 
-                sb.Append(constructedFile);
-                sb.Append(uploadedFileName.Replace(" ", "%20"));
-                sb.Append(".pdf");
-                constructedFile = sb.ToString();
+                client.AddDefaultHeader("Authorization", string.Format("Bearer {0}", config["HubSpot-API:Key"]));
 
-                deal.FileName = constructedFile;
+                request.AddFile("file", file, fileName, "application/octet-stream");
+                request.AddParameter("folderPath", "/PO");
 
-                Console.WriteLine("File uploaded successfully.");
-                Console.WriteLine("Response: " + response);
-                fileCreated = true;
+                var fileOptions = new
+                {
+                    access = @"PUBLIC_NOT_INDEXABLE",
+                };
+                // Transform it to JSON object
+                string jsonData = JsonConvert.SerializeObject(fileOptions);
+                request.AddParameter("options", jsonData);
+
+                var response = client.Execute(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    JObject jsonResponse = JObject.Parse(response.Content);
+                    string uploadedFileName = jsonResponse["objects"][0]["name"].ToString();
+
+                    // Construct the file path
+                    constructedFile = $"{config["HubSpot-API:File-Upload-Location"]}{uploadedFileName.Replace(" ", "%20")}.pdf";
+                    deal.FileName = constructedFile;
+
+                    Log.Information("File uploaded successfully.");
+                    Log.Information("Constructed File Path: " + constructedFile);
+                    fileCreated = true;
+                }
+                else
+                {
+                    Log.Error("Error uploading file. Status code: " + response.StatusCode);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("Error uploading file. Status code: " + response.StatusCode);
+                // Log any exceptions
+                Log.Error(ex, "An error occurred while uploading the file.");
+            }
+            finally
+            {
+                // Close and flush the Serilog logger
+                Log.CloseAndFlush();
             }
 
-            return (deal, constructedFile, fileCreated);
+            return deal;
         }
     }
 }

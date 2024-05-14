@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.Handlers
 {
-    public class PurchaseOrderUploadHandler : AbstractCompanyHandler
+    public class PurchaseOrderUploadHandler : DealHandlerBase
     {
         private readonly List<SystemParameters> systemParameters;
         public PurchaseOrderUploadHandler(List<SystemParameters> sp)
@@ -17,15 +17,13 @@ namespace HubSpotDealCreator.Handlers
             systemParameters = sp;
         }
 
-        public override async Task<(Deal,bool)> HandleAsync(Deal deal, IConfiguration config)
+        public override async Task<bool> Handle(Deal deal, IConfiguration config)
         {
             //File purchase order upload
 
-            var (tempDeal,fileName, isFileUploaded) = UploadPurchaseOrder.UploadFile(deal, config, systemParameters);
-            deal = tempDeal;
-            deal.FileUploaded = isFileUploaded;
+            Deal tempDeal = UploadPurchaseOrder.UploadFile(deal, config, systemParameters);               
 
-            return _nextHandler != null ? await _nextHandler.HandleAsync(deal, config) : (deal, false);
+            return await PassToNextHandler(tempDeal, config);
         }
     }
 }

@@ -9,28 +9,20 @@ using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.Handlers
 {
-    public class DomainSearchHandler : AbstractCompanyHandler
+    public class DomainSearchHandler : DealHandlerBase
     {
-        public override async Task<(Deal, bool)> HandleAsync(Deal deal, IConfiguration config)
+        public override async Task<bool> Handle(Deal deal, IConfiguration config)
         {
-            // If Domain is null, pass to the next handler
-            if (string.IsNullOrWhiteSpace(deal.Company.Domain) && _nextHandler != null)
+            // Implementation for domain search
+            // If search is successful, return true
+            // Otherwise, pass to the next handler
+            bool isDomainFound = await CheckHBCompanyDomain.SearchDomain(deal, config);
+            if (isDomainFound)
             {
-                return await _nextHandler.HandleAsync(deal, config);
-            }
-
-            // Call the domain search method
-            var (tempDeal, domainFound) = await CheckHBCompanyDomain.SearchDomain(deal, config);
-            deal = tempDeal;
-            deal.DomainFound = domainFound;
-
-            // If domain is found, return without passing to the next handler
-            if (domainFound)
-            {
-                return (deal, true);
+                return true;
             }
             // Pass to the next handler
-            return _nextHandler != null ? await _nextHandler.HandleAsync(deal, config) : (deal, false);
+            return await PassToNextHandler(deal, config);
         }
     }
 

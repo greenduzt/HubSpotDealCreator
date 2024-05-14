@@ -9,20 +9,15 @@ using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.Handlers
 {
-    public class CompanyCreationHandler : AbstractCompanyHandler
+    public class CompanyCreationHandler : DealHandlerBase
     { 
-        public override async Task<(Deal, bool)> HandleAsync(Deal deal, IConfiguration config)
-        {            
-            // No matching company found, create a new company
-            Console.WriteLine("No matching company found. Creating a new company...");
-
+        public override async Task<bool> Handle(Deal deal, IConfiguration config)
+        { 
             // Call the method to create a new company
             var (tempDeal,  companyCreated) = await CreateNewHBCompany.CreateNewCompany(deal, config);
-            deal = tempDeal;
-            deal.newCompanyCreated = companyCreated;                           
-
+                 
             // Return the deal and whether a new company was created
-            return _nextHandler != null ? await _nextHandler.HandleAsync(deal, config) : (deal, false);
+            return await PassToNextHandler(tempDeal, config);
         }
     }
 }

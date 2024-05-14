@@ -14,53 +14,71 @@ public class Program
         IConfiguration config = Configure();
 
         Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug() // Set minimum log level to Debug
-                .WriteTo.File(config["Logging:Path"], // Specify file name
-                    rollingInterval: RollingInterval.Day, // Specify rolling interval
-                    restrictedToMinimumLevel: LogEventLevel.Debug) // Specify minimum log level
+                .MinimumLevel.Debug() 
+                .WriteTo.File(config["Logging:Path"], 
+                    rollingInterval: RollingInterval.Day, 
+                    restrictedToMinimumLevel: LogEventLevel.Debug,
+                    shared:true) 
                 .CreateLogger();
+
+        Log.Information("---HubSpotDealCreator Started---");
+
         try
         {
-            // Initialize database configuration
+            // Initializing database configuration
             InitializeDatabase(config);
 
-            // Load necessary data
+            // Loading necessary data
             var (hubSpotProductList, systemParameters) = LoadData();
 
-            // Prepare sample data
+            // Preparing sample data
             Deal deal = PrepareDeal();
 
-            // Create handlers for sequential checks
+            // Creating handlers for checking company name, domain, and ABN
             var companyNameHandler = new CompanyNameSearchHandler();
             var domainHandler = new DomainSearchHandler();
             var abnHandler = new AbnSearchHandler();
-            var companyCreationHandler = new CompanyCreationHandler();
-            var purchasOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
-            var createDeal = new DealCreationHandler();
 
-            // Set up chain of responsibility
-             companyNameHandler.SetNext(domainHandler)
-                .SetNext(abnHandler)
-                .SetNext(companyCreationHandler)
-                .SetNext(purchasOrderUploadHandler)
-                .SetNext(createDeal);                                             
+            // Setting the next handler in the chain
+            companyNameHandler.SetNextHandler(domainHandler);
+            domainHandler.SetNextHandler(abnHandler);
 
-            // Initiate search process
-            var (finalDeal, isFound) = await companyNameHandler.HandleAsync(deal, config);
+            // Starting the chain with the company name handler
+            bool isCompanyFound = await companyNameHandler.Handle(deal, config);
 
-            // Finally, create line items and deal if required
-            if (isFound)
+            // If processing is not complete, proceeding with company creation, purchase order upload and deal creation
+            if (!isCompanyFound)
             {
-                await CreateLineItemsAndDeal.CreateNewDeal(finalDeal, config);
-            }
+                var companyCreationHandler = new CompanyCreationHandler();
+                var purchaseOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
+                var dealCreationHandler = new DealCreationHandler();
+
+                // Connecting the handlers sequentially
+                companyCreationHandler.SetNextHandler(purchaseOrderUploadHandler);
+                purchaseOrderUploadHandler.SetNextHandler(dealCreationHandler);
+
+                // Starting the processing chain with the first handler
+                await companyCreationHandler.Handle(deal, config);
+            }            
+            else
+            {
+                // If processing is complete, proceeding with purchase order upload and deal creation
+                var purchaseOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
+                var createDeal = new DealCreationHandler();
+
+                purchaseOrderUploadHandler.SetNextHandler(createDeal);
+
+                await purchaseOrderUploadHandler.Handle(deal, config);
+            }        
         }
         catch (Exception ex)
         {
-            // Log any unhandled exceptions
+            // Logging any unhandled exceptions
             Log.Error(ex, "An unhandled exception occurred");
         }
         finally
         {
+            Log.Information("---HubSpotDealCreator Ended---");
             // Close and flush the Serilog logger
             Log.CloseAndFlush();
         }
@@ -95,7 +113,8 @@ public class Program
     static Deal PrepareDeal() => new Deal
         {
             Company = new Company { ABN = "61166259025", Name = "gfhfh", Domain = "www.proone.com.au" },
-            DeliveryAddress = new Address(),
+            DeliveryAddress = new Address() { StreetAddress = "123 Street",State = "QLD", PostCode="3111",Suburb ="Newland",Country="Australia"},
+            DealName = "Test Deal",
             FileName = "Purchase_Order_No_42363.pdf",
             LineItems = new List<LineItems>() { new LineItems { SKU = "SY14G",Name = "Sand Yellow 1-4mm",Quantity = 80,UnitPrice = 2.05,NetPrice = 164 } }            
         };   

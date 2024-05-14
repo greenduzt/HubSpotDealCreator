@@ -9,28 +9,20 @@ using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.Handlers
 {
-    public class AbnSearchHandler : AbstractCompanyHandler
+    public class AbnSearchHandler : DealHandlerBase
     {
-        public override async Task<(Deal, bool)> HandleAsync(Deal deal, IConfiguration config)
+        public override async Task<bool> Handle(Deal deal, IConfiguration config)
         {
-            // If ABN is null, pass to the next handler
-            if (string.IsNullOrWhiteSpace(deal.Company.ABN) && _nextHandler != null)
+            // Implementation for ABN search
+            // If search is successful, return true
+            // Otherwise, pass to the next handler
+            bool isABNFound = await CheckHBABN.SearchABN(deal, config);
+            if (isABNFound)
             {
-                return await _nextHandler.HandleAsync(deal, config);
+                // Deal creation logic can be invoked here if needed
+                return true;
             }
-
-            // Call the ABN search method
-            var (tempDeal, abnFound) = await CheckHBABN.SearchABN(deal, config);
-            deal = tempDeal;
-            deal.AbnFound = abnFound;
-
-            // If ABN is found, return without passing to the next handler
-            if (abnFound)
-            {
-                return (deal, true);
-            }
-            // Pass to the next handler
-            return _nextHandler != null ? await _nextHandler.HandleAsync(deal, config) : (deal, false);
+            return await PassToNextHandler(deal, config);
         }
     }
 }

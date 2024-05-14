@@ -12,14 +12,15 @@ namespace HubSpotDealCreator.Utilities
 {
     public static class CheckHBCompanyDomain
     {
-        public static async Task<(Deal deal, bool isDomainFound)> SearchDomain(Deal deal, IConfiguration config)
+        public static async Task<bool> SearchDomain(Deal deal, IConfiguration config)
         {
 
             Log.Logger = new LoggerConfiguration()
                .MinimumLevel.Debug() 
                .WriteTo.File(config["Logging:Path"], 
                    rollingInterval: RollingInterval.Day, 
-                   restrictedToMinimumLevel: LogEventLevel.Debug) 
+                   restrictedToMinimumLevel: LogEventLevel.Debug,
+                   shared: true) 
                .CreateLogger();
 
             bool isDomainFound = false;
@@ -98,7 +99,7 @@ namespace HubSpotDealCreator.Utilities
                 // Close and flush the Serilog logger
                 Log.CloseAndFlush();
             }
-            return (deal,  isDomainFound);
+            return isDomainFound;
         }
     }
 }

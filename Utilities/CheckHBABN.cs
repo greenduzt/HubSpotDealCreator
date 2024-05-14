@@ -12,13 +12,14 @@ namespace HubSpotDealCreator.Utilities
 {
     public static class CheckHBABN
     {
-        public static async Task<(Deal deal, bool isABNFound)> SearchABN(Deal deal, IConfiguration config)
+        public static async Task<bool> SearchABN(Deal deal, IConfiguration config)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug() // Set minimum log level to Debug
-                .WriteTo.File(config["Logging:Path"], // Specify file name
-                    rollingInterval: RollingInterval.Day, // Specify rolling interval
-                    restrictedToMinimumLevel: LogEventLevel.Debug) // Specify minimum log level
+                .MinimumLevel.Debug() 
+                .WriteTo.File(config["Logging:Path"], 
+                    rollingInterval: RollingInterval.Day, 
+                    restrictedToMinimumLevel: LogEventLevel.Debug,
+                    shared: true) 
                 .CreateLogger();
 
             bool isABNFound = false;
@@ -95,7 +96,7 @@ namespace HubSpotDealCreator.Utilities
                 // Close and flush the Serilog logger
                 Log.CloseAndFlush();
             }
-            return (deal, isABNFound);
+            return isABNFound;
         }
     }
 }

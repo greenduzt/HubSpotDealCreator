@@ -19,11 +19,6 @@ namespace HubSpotDealCreator.Models
         public Company Company { get; set; }
         public string OrderNotes { get; set; }
         public string FileName { get; set; }
-        public List<LineItems> LineItems { get; set; }
-        public bool CompanyFound { get; set; }
-        public bool DomainFound { get; set; }
-        public bool AbnFound { get; set; }
-        public bool newCompanyCreated { get; set; }
-        public bool FileUploaded { get; set; }
+        public List<LineItems> LineItems { get; set; } 
     }
 }

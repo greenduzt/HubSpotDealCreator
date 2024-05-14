@@ -16,6 +16,8 @@ D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\Microsoft.Extensions.FileSystemG
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\Microsoft.Extensions.Primitives.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\Newtonsoft.Json.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\RestSharp.dll
+D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\Serilog.dll
+D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\Serilog.Sinks.File.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\System.Data.SqlClient.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\System.Text.Encodings.Web.dll
 D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\System.Text.Json.dll
@@ -36,5 +38,3 @@ D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\refint\HubSpotDealCreator.dll
 D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.pdb
 D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\HubSpotDealCreator.genruntimeconfig.cache
 D:\Projects\HubSpotDealCreator\obj\Debug\net6.0\ref\HubSpotDealCreator.dll
-D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\Serilog.dll
-D:\Projects\HubSpotDealCreator\bin\Debug\net6.0\Serilog.Sinks.File.dll

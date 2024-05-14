@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.Handlers
 {
-    public interface IVerifyCompanyHandler
+    public interface IDealHandler
     {
-        Task<(Deal, bool)> HandleAsync(Deal deal, IConfiguration config);
-        IVerifyCompanyHandler SetNext(IVerifyCompanyHandler handler);
+        Task<bool> Handle(Deal deal, IConfiguration config);
+        void SetNextHandler(IDealHandler nextHandler);
     }
 }

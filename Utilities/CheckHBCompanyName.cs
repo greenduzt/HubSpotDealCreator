@@ -13,13 +13,14 @@ namespace HubSpotDealCreator.Utilities
 {
     public static class CheckHBCompanyName
     {
-        public static async Task<(Deal deal,bool isCompanyFound)> SearchCompanyName(Deal deal, IConfiguration config)
+        public static async Task<bool> SearchCompanyName(Deal deal, IConfiguration config)
         {          
             Log.Logger = new LoggerConfiguration()
                .MinimumLevel.Debug() 
                .WriteTo.File(config["Logging:Path"], 
                    rollingInterval: RollingInterval.Day, 
-                   restrictedToMinimumLevel: LogEventLevel.Debug)
+                   restrictedToMinimumLevel: LogEventLevel.Information,
+                   shared:true)
                .CreateLogger();
 
             using (HttpClient client = new HttpClient())
@@ -102,7 +103,7 @@ namespace HubSpotDealCreator.Utilities
                     Log.CloseAndFlush();
                 }
 
-                return (deal, isCompanyFound);
+                return isCompanyFound;
             }
         }
     }
