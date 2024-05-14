@@ -17,16 +17,7 @@ namespace HubSpotDealCreator.Utilities
     {
         public static Deal UploadFile(Deal deal, IConfiguration config, List<SystemParameters> systemParameters)
         {
-            bool fileCreated = false;
-            string constructedFile = string.Empty;
-
-            Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Debug()
-               .WriteTo.File(config["Logging:Path"],
-                   rollingInterval: RollingInterval.Day,
-                   restrictedToMinimumLevel: LogEventLevel.Debug, 
-                   shared: true)
-               .CreateLogger();
+            string constructedFile = string.Empty;          
 
             try
             {
@@ -70,7 +61,6 @@ namespace HubSpotDealCreator.Utilities
 
                     Log.Information("File uploaded successfully.");
                     Log.Information("Constructed File Path: " + constructedFile);
-                    fileCreated = true;
                 }
                 else
                 {
@@ -82,12 +72,7 @@ namespace HubSpotDealCreator.Utilities
                 // Log any exceptions
                 Log.Error(ex, "An error occurred while uploading the file.");
             }
-            finally
-            {
-                // Close and flush the Serilog logger
-                Log.CloseAndFlush();
-            }
-
+            
             return deal;
         }
     }

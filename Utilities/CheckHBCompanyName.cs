@@ -14,15 +14,7 @@ namespace HubSpotDealCreator.Utilities
     public static class CheckHBCompanyName
     {
         public static async Task<bool> SearchCompanyName(Deal deal, IConfiguration config)
-        {          
-            Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Debug() 
-               .WriteTo.File(config["Logging:Path"], 
-                   rollingInterval: RollingInterval.Day, 
-                   restrictedToMinimumLevel: LogEventLevel.Information,
-                   shared:true)
-               .CreateLogger();
-
+        {  
             using (HttpClient client = new HttpClient())
             {
                 string json = @"{
@@ -80,7 +72,7 @@ namespace HubSpotDealCreator.Utilities
                             deal.Company.CustomerType = result.properties.customer_type;
                             isCompanyFound = true;
 
-                            Log.Debug($"Company details: ID: {deal.Company.CompanyID}, Name: {deal.Company.Name}, Domain: {deal.Company.Domain}, ABN: {deal.Company.ABN}, CustomerType: {deal.Company.CustomerType}");
+                            Log.Information($"Company details: ID: {deal.Company.CompanyID}, Name: {deal.Company.Name}, Domain: {deal.Company.Domain}, ABN: {deal.Company.ABN}, CustomerType: {deal.Company.CustomerType}");
                         }
                         else
                         {
@@ -96,12 +88,7 @@ namespace HubSpotDealCreator.Utilities
                 {
                     // Log any exceptions
                     Log.Error(ex, "An error occurred while searching for company name");
-                }
-                finally
-                {
-                    // Close and flush the Serilog logger
-                    Log.CloseAndFlush();
-                }
+                }              
 
                 return isCompanyFound;
             }

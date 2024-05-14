@@ -15,14 +15,6 @@ namespace HubSpotDealCreator.Utilities
         public static async Task<bool> SearchDomain(Deal deal, IConfiguration config)
         {
 
-            Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Debug() 
-               .WriteTo.File(config["Logging:Path"], 
-                   rollingInterval: RollingInterval.Day, 
-                   restrictedToMinimumLevel: LogEventLevel.Debug,
-                   shared: true) 
-               .CreateLogger();
-
             bool isDomainFound = false;
 
             try 
@@ -74,7 +66,7 @@ namespace HubSpotDealCreator.Utilities
 
                             isDomainFound = true;
 
-                            Log.Debug($"Company details: ID: {deal.Company.CompanyID}, Name: {deal.Company.Name}, Domain: {deal.Company.Domain}, ABN: {deal.Company.ABN}, CustomerType: {deal.Company.CustomerType}");
+                            Log.Information($"Company details: ID: {deal.Company.CompanyID}, Name: {deal.Company.Name}, Domain: {deal.Company.Domain}, ABN: {deal.Company.ABN}, CustomerType: {deal.Company.CustomerType}");
 
                         }
                         else
@@ -91,14 +83,9 @@ namespace HubSpotDealCreator.Utilities
             catch (Exception ex)
             {
                 // Log any exceptions
-                Log.Error(ex, "An error occurred while searching by domain");
-                throw; // Rethrow the exception to be handled by the caller
+                Log.Error(ex, "An error occurred while searching by domain");              
             }
-            finally
-            {
-                // Close and flush the Serilog logger
-                Log.CloseAndFlush();
-            }
+           
             return isDomainFound;
         }
     }

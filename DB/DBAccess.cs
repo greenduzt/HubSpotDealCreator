@@ -1,10 +1,6 @@
 ﻿using HubSpotDealCreator.Models;
-using System;
-using System.Collections.Generic;
+using Serilog;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.DB
 {
@@ -14,18 +10,12 @@ namespace HubSpotDealCreator.DB
         {
             List<HubSpotProduct> hubSpotProductList = new List<HubSpotProduct>();
             
-            // Create a SqlConnection object
             using (SqlConnection conn = new SqlConnection(DBConfiguration.GetConnectionString()))
             {
                 try
                 {
-                    // Open the connection
-                    conn.Open();
+                    conn.Open();                   
 
-                    // Perform database operations here
-                    Console.WriteLine("Connected to SQL Server!");
-
-                    // Example: Execute a simple query
                     string sqlQuery = "SELECT * FROM HubSpotProducts";
                     using (SqlCommand command = new SqlCommand(sqlQuery, conn))
                     {
@@ -48,7 +38,7 @@ namespace HubSpotDealCreator.DB
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    Log.Error($"Could not connect to the sql server. Error loading HubSpotProducts {ex.Message}");
                 }
             }
 
@@ -59,7 +49,6 @@ namespace HubSpotDealCreator.DB
         {
             List<SystemParameters> systemParameters = new List<SystemParameters>();
 
-            // Create a SqlConnection object
             using (SqlConnection conn = new SqlConnection(DBConfiguration.GetConnectionString()))
             {
                 try
@@ -82,7 +71,7 @@ namespace HubSpotDealCreator.DB
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    Log.Error($"Could not connect to the sql server. Error loading SystemParameters {ex.Message}");
                 }
             }
 

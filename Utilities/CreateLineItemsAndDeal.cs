@@ -16,29 +16,19 @@ namespace HubSpotDealCreator.Utilities
 
             try
             {
-                // Configure Serilog
-                Log.Logger = new LoggerConfiguration()
-                    .MinimumLevel.Debug()
-                    .WriteTo.File(config["Logging:Path"],
-                        rollingInterval: RollingInterval.Day,
-                        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug,
-                        shared:true)
-                    .CreateLogger();
-
                 using (HttpClient client = new HttpClient())
                 {
                     string apiUrl = "https://api.hubapi.com/crm/v3/objects/deals";
                     string lineItemsApiUrl = "https://api.hubapi.com/crm/v3/objects/line_items/batch/create";
-                    string lineItemsInfo=string.Empty;
-
+                    
                     // Set the authorization header with the API key
                     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {config["HubSpot-API:Key"]}");
 
                     // Create a StringBuilder to construct the JSON string
                     StringBuilder jsonBuilder = new StringBuilder();
                     jsonBuilder.Append("{ \"inputs\": [");
-
-                    lineItemsInfo = $"Deal Line Items : "; 
+                                        
+                    StringBuilder lineItemsInfoBuilder = new StringBuilder();
 
                     // Iterate through deal.LineItems and add each line item to the JSON
                     foreach (var lineItem in deal.LineItems)
@@ -52,10 +42,10 @@ namespace HubSpotDealCreator.Utilities
                         jsonBuilder.Append($"\"quantity\": \"{lineItem.Quantity}\"");
                         jsonBuilder.Append("}");
                         jsonBuilder.Append("},");
-                        lineItemsInfo += $"Name : {lineItem.Name} SKU : {lineItem.SKU} Price : {lineItem.UnitPrice} Quantity : {lineItem.Quantity} ";
+                        lineItemsInfoBuilder.Append($"[Name : {lineItem.Name}|SKU : {lineItem.SKU}|Price : {lineItem.UnitPrice}|Quantity : {lineItem.Quantity}]");
                     }
 
-                    Log.Information($"Deal Line Items : {lineItemsInfo}");
+                    Log.Information($"Deal Line Items : {lineItemsInfoBuilder.ToString()}");
 
                     // Remove the trailing comma if there are line items
                     if (deal.LineItems.Any())
@@ -149,15 +139,15 @@ namespace HubSpotDealCreator.Utilities
 
                         // Log deal request for debugging
                         string dealData = JsonConvert.SerializeObject(dealRequest);
-                        Log.Information($"Deal Name : {deal.DealName} Amount : {deal.Total} " +
-                            $"HubSpot Owner ID : {dealRequest.properties.hubspot_owner_id} " +
-                            $"Shipping Add : {deal.DeliveryAddress.StreetAddress}" +
-                            $"Shipping City : {deal.DeliveryAddress.Suburb}" +
-                            $"Shipping PostCode : {deal.DeliveryAddress.PostCode}" +
-                            $"Shipping State : {deal.DeliveryAddress.State}" +
-                            $"Shipping Country : {deal.DeliveryAddress.Country}" +
-                            $"Order Notes : {deal.OrderNotes}" +
-                            $"PO URL : {deal.FileName}");
+                        Log.Information($"Deal Name : {deal.DealName}|Amount : {deal.Total} " +
+                            $"|HubSpot Owner ID : {dealRequest.properties.hubspot_owner_id} " +
+                            $"|Shipping Add : {deal.DeliveryAddress.StreetAddress}" +
+                            $"|Shipping City : {deal.DeliveryAddress.Suburb}" +
+                            $"|Shipping PostCode : {deal.DeliveryAddress.PostCode}" +
+                            $"|Shipping State : {deal.DeliveryAddress.State}" +
+                            $"|Shipping Country : {deal.DeliveryAddress.Country}" +
+                            $"|Order Notes : {deal.OrderNotes}" +
+                            $"|PO URL : {deal.FileName}");
 
                         // Create the HttpContent with the JSON data and set the content type
                         HttpContent dealContent = new StringContent(dealData, Encoding.UTF8, "application/json");
@@ -189,12 +179,7 @@ namespace HubSpotDealCreator.Utilities
             {
                 Log.Error(ex, "An error occurred while creating the deal.");
                 //throw; // Rethrow the exception to be handled by the caller
-            }
-            finally
-            {
-                // Close and flush the Serilog logger
-                Log.CloseAndFlush();
-            }
+            }            
 
             return (deal, isDealCreated);
         }

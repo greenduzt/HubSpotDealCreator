@@ -17,14 +17,6 @@ namespace HubSpotDealCreator.Utilities
         {
             bool companyCreated = false;
 
-            Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Debug()
-               .WriteTo.File(config["Logging:Path"],
-                   rollingInterval: RollingInterval.Day,
-                   restrictedToMinimumLevel: LogEventLevel.Debug, 
-                   shared: true)
-               .CreateLogger();
-
             try
             {
                 using (HttpClient client = new HttpClient())
@@ -76,12 +68,7 @@ namespace HubSpotDealCreator.Utilities
                 // Log any exceptions that occur during the process
                 Log.Error(ex, "An error occurred while creating the company.");
                 throw; // Rethrow the exception to be handled by the caller
-            }
-            finally
-            {
-                // Close and flush the Serilog logger
-                Log.CloseAndFlush();
-            }
+            }            
 
             return (deal, companyCreated);
         }

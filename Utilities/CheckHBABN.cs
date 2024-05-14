@@ -13,14 +13,7 @@ namespace HubSpotDealCreator.Utilities
     public static class CheckHBABN
     {
         public static async Task<bool> SearchABN(Deal deal, IConfiguration config)
-        {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug() 
-                .WriteTo.File(config["Logging:Path"], 
-                    rollingInterval: RollingInterval.Day, 
-                    restrictedToMinimumLevel: LogEventLevel.Debug,
-                    shared: true) 
-                .CreateLogger();
+        {    
 
             bool isABNFound = false;
 
@@ -91,11 +84,7 @@ namespace HubSpotDealCreator.Utilities
                 // Log any exceptions
                 Log.Error(ex, "An error occurred while searching by ABN");
             }
-            finally
-            {
-                // Close and flush the Serilog logger
-                Log.CloseAndFlush();
-            }
+           
             return isABNFound;
         }
     }
