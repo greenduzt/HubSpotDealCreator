@@ -64,13 +64,15 @@ public class Program
                 }
                 else
                 {
-                    // If processing is complete, proceeding with purchase order upload and deal creation
+                    // If customer is found or created, proceeding with salesrep allocation, purchase order upload and deal creation
+                    var salesRepHandler = new SalesRepHandler();
                     var purchaseOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
                     var createDeal = new DealCreationHandler();
 
+                    salesRepHandler.SetNextHandler(purchaseOrderUploadHandler);
                     purchaseOrderUploadHandler.SetNextHandler(createDeal);
 
-                    await purchaseOrderUploadHandler.Handle(deal, config);
+                    await salesRepHandler.Handle(deal, config);
                 }
             }
         }
