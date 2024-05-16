@@ -17,7 +17,7 @@ namespace HubSpotDealCreator.Handlers
             systemParameters = sp;
         }
 
-        public override async Task<bool> Handle(Deal deal, IConfiguration config)
+        public override async Task<(Deal,bool)> Handle(Deal deal, IConfiguration config)
         {
             //File purchase order upload
 

@@ -7,20 +7,20 @@ namespace HubSpotDealCreator.Handlers
     {
         private IDealHandler _nextHandler;
 
-        public abstract Task<bool> Handle(Deal deal, IConfiguration config);
+        public abstract Task<(Deal,bool)> Handle(Deal deal, IConfiguration config);
 
         public void SetNextHandler(IDealHandler nextHandler)
         {
             _nextHandler = nextHandler;
         }
 
-        protected async Task<bool> PassToNextHandler(Deal deal, IConfiguration config)
+        protected async Task<(Deal,bool)> PassToNextHandler(Deal deal, IConfiguration config)
         {
             if (_nextHandler != null)
             {
                 return await _nextHandler.Handle(deal, config);
             }
-            return false;
+            return (null,false);
         }
     }
 }

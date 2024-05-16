@@ -11,15 +11,15 @@ namespace HubSpotDealCreator.Handlers
 {
     public class CompanyNameSearchHandler : DealHandlerBase
     {  
-        public override async Task<bool> Handle(Deal deal, IConfiguration config)
+        public override async Task<(Deal,bool)> Handle(Deal deal, IConfiguration config)
         {
             // Implementation for company name search
             // If search is successful, return true
             // Otherwise, pass to the next handler
-            bool isCompanyNameFound = await CheckHBCompanyName.SearchCompanyName(deal, config);           
+            var (dealUpdated,isCompanyNameFound) = await CheckHBCompanyName.SearchCompanyName(deal, config);           
             if (isCompanyNameFound)
             {
-                return true;
+                return (dealUpdated,isCompanyNameFound);
             }
             // Pass to the next handler
             return await PassToNextHandler(deal, config);

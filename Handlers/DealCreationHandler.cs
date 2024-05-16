@@ -11,10 +11,10 @@ namespace HubSpotDealCreator.Handlers
 {
     public class DealCreationHandler : DealHandlerBase
     {
-        public override async Task<bool> Handle(Deal deal,IConfiguration config)
+        public override async Task<(Deal,bool)> Handle(Deal deal,IConfiguration config)
         {
-           var ( d,isDealCreated)= await CreateLineItemsAndDeal.CreateNewDeal(deal, config);
-           return isDealCreated;    
+           var ( dealUpdated,isDealCreated)= await CreateLineItemsAndDeal.CreateNewDeal(deal, config);
+           return (dealUpdated,isDealCreated);    
         }
     }
 }

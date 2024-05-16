@@ -13,7 +13,7 @@ namespace HubSpotDealCreator.Utilities
 {
     public static class CheckHBCompanyName
     {
-        public static async Task<bool> SearchCompanyName(Deal deal, IConfiguration config)
+        public static async Task<(Deal,bool)> SearchCompanyName(Deal deal, IConfiguration config)
         {  
             using (HttpClient client = new HttpClient())
             {
@@ -90,7 +90,7 @@ namespace HubSpotDealCreator.Utilities
                     Log.Error(ex, "An error occurred while searching for company name");
                 }              
 
-                return isCompanyFound;
+                return (deal,isCompanyFound);
             }
         }
     }

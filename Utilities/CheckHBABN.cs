@@ -12,7 +12,7 @@ namespace HubSpotDealCreator.Utilities
 {
     public static class CheckHBABN
     {
-        public static async Task<bool> SearchABN(Deal deal, IConfiguration config)
+        public static async Task<(Deal,bool)> SearchABN(Deal deal, IConfiguration config)
         {    
 
             bool isABNFound = false;
@@ -85,7 +85,7 @@ namespace HubSpotDealCreator.Utilities
                 Log.Error(ex, "An error occurred while searching by ABN");
             }
            
-            return isABNFound;
+            return (deal,isABNFound);
         }
     }
 }

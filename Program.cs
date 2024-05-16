@@ -46,7 +46,7 @@ public class Program
                 domainHandler.SetNextHandler(abnHandler);
 
                 // Starting the chain with the company name handler
-                bool isCompanyFound = await companyNameHandler.Handle(deal, config);
+                var (dealUpdated,isCompanyFound) = await companyNameHandler.Handle(deal, config);
 
                 // If processing is not complete, proceeding with company creation, purchase order upload and deal creation
                 if (!isCompanyFound)
@@ -117,10 +117,11 @@ public class Program
     // Prepare sample data
     static Deal PrepareDeal() => new Deal
         {
-            Company = new Company { ABN = "61166259025", Name = "gfhfh", Domain = "www.sss.com" },
+            Company = new Company { ABN = "", Name = "chamara", Domain = "" },
             DeliveryAddress = new Address() { StreetAddress = "123 Street",State = "QLD", PostCode="3111",Suburb ="Newland",Country="Australia"},
             DealName = "Test Deal",
             FileName = "Purchase_Order_No_42363.pdf",
+            Emails = new List<string> { "chamara@a1rubber.com","leeanne@a1rubber.com","alex@yahoo.com","david@gmail.com" },
             LineItems = new List<LineItems>() { new LineItems { SKU = "SY14G",Name = "Sand Yellow 1-4mm",Quantity = 80,UnitPrice = 2.05,NetPrice = 164 }, 
                                                 new LineItems { SKU = "Prod3", Name = "prod 3 description", Quantity = 180, UnitPrice = 1.05, NetPrice = 1464 } }            
         };   

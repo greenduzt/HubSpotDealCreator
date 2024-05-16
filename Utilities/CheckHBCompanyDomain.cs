@@ -12,7 +12,7 @@ namespace HubSpotDealCreator.Utilities
 {
     public static class CheckHBCompanyDomain
     {
-        public static async Task<bool> SearchDomain(Deal deal, IConfiguration config)
+        public static async Task<(Deal,bool)> SearchDomain(Deal deal, IConfiguration config)
         {
 
             bool isDomainFound = false;
@@ -86,7 +86,7 @@ namespace HubSpotDealCreator.Utilities
                 Log.Error(ex, "An error occurred while searching by domain");              
             }
            
-            return isDomainFound;
+            return (deal,isDomainFound);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace HubSpotDealCreator.Handlers
 {
     public interface IDealHandler
     {
-        Task<bool> Handle(Deal deal, IConfiguration config);
+        Task<(Deal, bool)> Handle(Deal deal, IConfiguration config);
         void SetNextHandler(IDealHandler nextHandler);
     }
 }

@@ -11,16 +11,16 @@ namespace HubSpotDealCreator.Handlers
 {
     public class AbnSearchHandler : DealHandlerBase
     {
-        public override async Task<bool> Handle(Deal deal, IConfiguration config)
+        public override async Task<(Deal,bool)> Handle(Deal deal, IConfiguration config)
         {
             // Implementation for ABN search
             // If search is successful, return true
             // Otherwise, pass to the next handler
-            bool isABNFound = await CheckHBABN.SearchABN(deal, config);
+            var (dealUpdated,isABNFound) = await CheckHBABN.SearchABN(deal, config);
             if (isABNFound)
             {
                 // Deal creation logic can be invoked here if needed
-                return true;
+                return (dealUpdated, isABNFound);
             }
             return await PassToNextHandler(deal, config);
         }

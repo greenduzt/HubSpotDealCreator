@@ -11,7 +11,7 @@ namespace HubSpotDealCreator.Handlers
 {
     public class CompanyCreationHandler : DealHandlerBase
     { 
-        public override async Task<bool> Handle(Deal deal, IConfiguration config)
+        public override async Task<(Deal, bool)> Handle(Deal deal, IConfiguration config)
         { 
             // Call the method to create a new company
             var (tempDeal,  companyCreated) = await CreateNewHBCompany.CreateNewCompany(deal, config);
