@@ -32,12 +32,14 @@ namespace HubSpotDealCreator.Utilities
                         foreach (var owner in ownersArray)
                         {
                             string email = (string)owner["email"];
+                            string ownerId = (string)owner["ownerId"];
 
-                            JArray seats = (JArray)owner["remoteList"];
-
-                            if (seats != null && seats.Any(s => (string)s["remoteType"] == "HUBSPOT" && (bool)s["active"] && (string)s["remoteId"] == "salespro"))
+                            if(deal.Emails.Any(x=>x.Equals(email,StringComparison.OrdinalIgnoreCase)))
                             {
-                                //salesProUsers.Add(email);
+                                // Allocating the sales rep to the deal
+                                deal.OwnerId = ownerId;
+                                isSalesRepFound = true;
+                                break; // Exit the loop once a sales rep is found
                             }
                         }
                     }

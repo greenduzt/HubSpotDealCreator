@@ -14,12 +14,8 @@ namespace HubSpotDealCreator.Handlers
         public override async Task<(Deal,bool)> Handle(Deal deal, IConfiguration config)
         {
             var (dealUpdated,isSalesRepFound) = await SalesRepAllocator.AllocateSalesRepToDeal(deal, config);
-            if(isSalesRepFound)
-            {
-                return (dealUpdated,isSalesRepFound);
-            }
-
-            return await PassToNextHandler(deal, config);
+         
+            return await PassToNextHandler(dealUpdated, config);
         }
     }
 }

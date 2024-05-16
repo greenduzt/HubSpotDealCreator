@@ -51,16 +51,18 @@ public class Program
                 // If processing is not complete, proceeding with company creation, purchase order upload and deal creation
                 if (!isCompanyFound)
                 {
+                    var salesRepHandler = new SalesRepHandler();
                     var companyCreationHandler = new CompanyCreationHandler();
                     var purchaseOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
                     var dealCreationHandler = new DealCreationHandler();
 
                     // Connecting the handlers sequentially
-                    companyCreationHandler.SetNextHandler(purchaseOrderUploadHandler);
+                    salesRepHandler.SetNextHandler(companyCreationHandler);
+                    companyCreationHandler.SetNextHandler(purchaseOrderUploadHandler);                    
                     purchaseOrderUploadHandler.SetNextHandler(dealCreationHandler);
 
                     // Starting the processing chain with the first handler
-                    await companyCreationHandler.Handle(deal, config);
+                    await salesRepHandler.Handle(deal, config);
                 }
                 else
                 {
@@ -119,7 +121,7 @@ public class Program
     // Prepare sample data
     static Deal PrepareDeal() => new Deal
         {
-            Company = new Company { ABN = "", Name = "chamara", Domain = "" },
+            Company = new Company { ABN = "1111", Name = "chamara1", Domain = "" },
             DeliveryAddress = new Address() { StreetAddress = "123 Street",State = "QLD", PostCode="3111",Suburb ="Newland",Country="Australia"},
             DealName = "Test Deal",
             FileName = "Purchase_Order_No_42363.pdf",
