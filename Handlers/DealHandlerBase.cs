@@ -1,4 +1,4 @@
-﻿using HubSpotDealCreator.Models;
+﻿using CoreLibrary.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace HubSpotDealCreator.Handlers

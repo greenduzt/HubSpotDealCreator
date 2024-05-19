@@ -1,28 +1,21 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HubSpotDealCreator.Models;
+﻿using CoreLibrary.Models;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RestSharp;
 using Serilog;
-using Serilog.Events;
 
 namespace HubSpotDealCreator.Utilities
 {
     public static class UploadPurchaseOrder
     {
-        public static Deal UploadFile(Deal deal, IConfiguration config, List<SystemParameters> systemParameters)
+        public static Deal UploadFile(Deal deal, IConfiguration config, string filePath)
         {
             string constructedFile = string.Empty;          
 
             try
-            {
-                var filePath = systemParameters.FirstOrDefault(x => x.Type.Equals("po_location"));
-                string fileName = Path.GetFileName(filePath.AttchmentLocation + @"\" + deal.FileName);
+            {               
+                string fileName = Path.GetFileName(filePath + @"\" + deal.FileName);
 
                 // Check if deal.FileName is null
                 if (string.IsNullOrWhiteSpace(deal.FileName))
@@ -31,7 +24,7 @@ namespace HubSpotDealCreator.Utilities
                     return deal;
                 }
 
-                var file = File.ReadAllBytes(filePath.AttchmentLocation + @"\" + fileName);
+                var file = File.ReadAllBytes(filePath + @"\" + fileName);
                 var client = new RestClient("https://api.hubapi.com/");
                 var request = new RestRequest("/filemanager/api/v3/files/upload", Method.Post);
 

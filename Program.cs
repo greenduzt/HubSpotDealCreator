@@ -1,10 +1,10 @@
-﻿using HubSpotDealCreator.DB;
+﻿using CoreLibrary.Data;
+using CoreLibrary.Models;
 using HubSpotDealCreator.Handlers;
-using HubSpotDealCreator.Models;
-using HubSpotDealCreator.Utilities;
 using Microsoft.Extensions.Configuration;
-using Serilog.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Serilog.Events;
 
 public class Program
 {
@@ -25,57 +25,54 @@ public class Program
 
         try
         {
-            // Initializing database configuration
-            InitializeDatabase(config);
-
-            // Loading necessary data
-            var (hubSpotProductList, systemParameters) = LoadData();
-
-            if (hubSpotProductList.Count > 0 && systemParameters.Count > 0)
+            var services = ConfigureServices(config);
+            using (var serviceProvider = services.BuildServiceProvider())
             {
-                // Preparing sample data
-                Deal deal = PrepareDeal();
+                
+                    // Preparing sample data
+                    Deal deal = PrepareDeal();
 
-                // Creating handlers for checking company name, domain, and ABN
-                var companyNameHandler = new CompanyNameSearchHandler();
-                var domainHandler = new DomainSearchHandler();
-                var abnHandler = new AbnSearchHandler();
+                    // Creating handlers for checking company name, domain, and ABN
+                    var companyNameHandler = new CompanyNameSearchHandler();
+                    var domainHandler = new DomainSearchHandler();
+                    var abnHandler = new AbnSearchHandler();
 
-                // Setting the next handler in the chain
-                companyNameHandler.SetNextHandler(domainHandler);
-                domainHandler.SetNextHandler(abnHandler);
+                    // Setting the next handler in the chain
+                    companyNameHandler.SetNextHandler(domainHandler);
+                    domainHandler.SetNextHandler(abnHandler);
 
-                // Starting the chain with the company name handler
-                var (dealUpdated,isCompanyFound) = await companyNameHandler.Handle(deal, config);
+                    // Starting the chain with the company name handler
+                    var (dealUpdated, isCompanyFound) = await companyNameHandler.Handle(deal, config);
 
-                // If processing is not complete, proceeding with company creation, purchase order upload and deal creation
-                if (!isCompanyFound)
-                {
-                    var salesRepHandler = new SalesRepHandler();
-                    var companyCreationHandler = new CompanyCreationHandler();
-                    var purchaseOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
-                    var dealCreationHandler = new DealCreationHandler();
+                    // If processing is not complete, proceeding with company creation, purchase order upload and deal creation
+                    if (!isCompanyFound)
+                    {
+                        var salesRepHandler = new SalesRepHandler();
+                        var companyCreationHandler = new CompanyCreationHandler();
+                        var purchaseOrderUploadHandler = new PurchaseOrderUploadHandler(deal.FilePath);
+                        var dealCreationHandler = new DealCreationHandler();
 
-                    // Connecting the handlers sequentially
-                    salesRepHandler.SetNextHandler(companyCreationHandler);
-                    companyCreationHandler.SetNextHandler(purchaseOrderUploadHandler);                    
-                    purchaseOrderUploadHandler.SetNextHandler(dealCreationHandler);
+                        // Connecting the handlers sequentially
+                        salesRepHandler.SetNextHandler(companyCreationHandler);
+                        companyCreationHandler.SetNextHandler(purchaseOrderUploadHandler);
+                        purchaseOrderUploadHandler.SetNextHandler(dealCreationHandler);
 
-                    // Starting the processing chain with the first handler
-                    await salesRepHandler.Handle(deal, config);
-                }
-                else
-                {
-                    // If customer is found or created, proceeding with salesrep allocation, purchase order upload and deal creation
-                    var salesRepHandler = new SalesRepHandler();
-                    var purchaseOrderUploadHandler = new PurchaseOrderUploadHandler(systemParameters);
-                    var createDeal = new DealCreationHandler();
+                        // Starting the processing chain with the first handler
+                        await salesRepHandler.Handle(deal, config);
+                    }
+                    else
+                    {
+                        // If customer is found or created, proceeding with salesrep allocation, purchase order upload and deal creation
+                        var salesRepHandler = new SalesRepHandler();
+                        var purchaseOrderUploadHandler = new PurchaseOrderUploadHandler(deal.FilePath);
+                        var createDeal = new DealCreationHandler();
 
-                    salesRepHandler.SetNextHandler(purchaseOrderUploadHandler);
-                    purchaseOrderUploadHandler.SetNextHandler(createDeal);
+                        salesRepHandler.SetNextHandler(purchaseOrderUploadHandler);
+                        purchaseOrderUploadHandler.SetNextHandler(createDeal);
 
-                    await salesRepHandler.Handle(deal, config);
-                }
+                        await salesRepHandler.Handle(deal, config);
+                    }
+                
             }
         }
         catch (Exception ex)
@@ -100,23 +97,7 @@ public class Program
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddUserSecrets<Program>(true)
             .Build();
-
-    static (List<HubSpotProduct>, List<SystemParameters>) LoadData()
-    {
-        // Load HubSpot products
-        var hubSpotProductList = DBAccess.LoadHubSpotProducts();
-
-        // Get system parameters
-        var systemParameters = DBAccess.GetSystemParameters();
-
-        return (hubSpotProductList, systemParameters);
-    }
-
-    static void InitializeDatabase(IConfiguration config)
-    {
-        DBConfiguration.Config = config;
-        DBConfiguration.Initialize();    
-    }
+       
 
     // Prepare sample data
     static Deal PrepareDeal() => new Deal
@@ -126,11 +107,16 @@ public class Program
             DealName = "Test Deal",
             FileName = "Purchase_Order_No_42363.pdf",
             Emails = new List<string> { "chamara@a1rubber.com","leeanne@a1rubber.com","alex@yahoo.com","david@gmail.com" },
-            LineItems = new List<LineItems>() { new LineItems { SKU = "SY14G",Name = "Sand Yellow 1-4mm",Quantity = 80,UnitPrice = 2.05,NetPrice = 164 }, 
-                                                new LineItems { SKU = "Prod3", Name = "prod 3 description", Quantity = 180, UnitPrice = 1.05, NetPrice = 1464 } }            
-        };   
+            LineItems = new List<LineItems>() { new LineItems { SKU = "SY14G",Name = "Sand Yellow 1-4mm",Quantity = 80,UnitPrice = 2.05M,NetPrice = 164 }, 
+                                                new LineItems { SKU = "Prod3", Name = "prod 3 description", Quantity = 180, UnitPrice = 1.05M, NetPrice = 1464 } }            
+        };
 
-    
+    private static IServiceCollection ConfigureServices(IConfiguration config)
+    {
+        var services = new ServiceCollection();
+        services.AddDataAccessServices(config); // Pass IConfiguration
+        return services;
+    }
 
 }
 

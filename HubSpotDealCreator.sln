@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubSpotDealCreator", "HubSpotDealCreator.csproj", "{42E7B0F6-B140-4537-9F51-53A67A6BF136}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HubSpotDealCreator", "HubSpotDealCreator.csproj", "{42E7B0F6-B140-4537-9F51-53A67A6BF136}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreLibrary.Models", "..\CoreLibrary.Models\CoreLibrary.Models.csproj", "{DBE2C0F2-A11A-4E4F-B15F-6CF6CE6BB30D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreLibrary.Data", "..\CoreLibrary.Data\CoreLibrary.Data.csproj", "{3809EC90-43E5-4D6E-9505-B3D698921E56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{42E7B0F6-B140-4537-9F51-53A67A6BF136}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42E7B0F6-B140-4537-9F51-53A67A6BF136}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42E7B0F6-B140-4537-9F51-53A67A6BF136}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBE2C0F2-A11A-4E4F-B15F-6CF6CE6BB30D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBE2C0F2-A11A-4E4F-B15F-6CF6CE6BB30D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBE2C0F2-A11A-4E4F-B15F-6CF6CE6BB30D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBE2C0F2-A11A-4E4F-B15F-6CF6CE6BB30D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3809EC90-43E5-4D6E-9505-B3D698921E56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3809EC90-43E5-4D6E-9505-B3D698921E56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3809EC90-43E5-4D6E-9505-B3D698921E56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3809EC90-43E5-4D6E-9505-B3D698921E56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

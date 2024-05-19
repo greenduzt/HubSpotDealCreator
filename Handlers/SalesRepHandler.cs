@@ -1,11 +1,7 @@
-﻿using HubSpotDealCreator.Models;
+﻿using CoreLibrary;
+using CoreLibrary.Models;
 using HubSpotDealCreator.Utilities;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.Handlers
 {

@@ -1,10 +1,9 @@
-﻿using HubSpotDealCreator.Models;
+﻿using CoreLibrary.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Serilog.Events;
 using Serilog;
 using System.Text;
-using Type = HubSpotDealCreator.Models.Type;
+using Type = CoreLibrary.Models.Type;
 
 namespace HubSpotDealCreator.Utilities
 {

@@ -1,27 +1,22 @@
-﻿using HubSpotDealCreator.Models;
+﻿using CoreLibrary.Models;
 using HubSpotDealCreator.Utilities;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HubSpotDealCreator.Handlers
 {
     public class PurchaseOrderUploadHandler : DealHandlerBase
     {
-        private readonly List<SystemParameters> systemParameters;
-        public PurchaseOrderUploadHandler(List<SystemParameters> sp)
+        private readonly string filePath;
+        public PurchaseOrderUploadHandler(string fp)
         {
-            systemParameters = sp;
+            filePath = fp;
         }
 
         public override async Task<(Deal,bool)> Handle(Deal deal, IConfiguration config)
         {
             //File purchase order upload
 
-            Deal tempDeal = UploadPurchaseOrder.UploadFile(deal, config, systemParameters);               
+            Deal tempDeal = UploadPurchaseOrder.UploadFile(deal, config, filePath);               
 
             return await PassToNextHandler(tempDeal, config);
         }
