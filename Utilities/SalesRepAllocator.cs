@@ -23,7 +23,7 @@ namespace HubSpotDealCreator.Utilities
                     {
                         string responseBody = await response.Content.ReadAsStringAsync();
                         JArray ownersArray = JArray.Parse(responseBody);
-                        deal.SalesRepName = "";
+
                         // Check if Deal.SalesRepName available, if so get the owner id
                         if (!string.IsNullOrWhiteSpace(deal.SalesRepName))
                         {

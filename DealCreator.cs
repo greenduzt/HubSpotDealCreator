@@ -18,13 +18,13 @@ namespace HubSpotDealCreator
 
         public async Task CreateDealAsync(Deal deal)
         {          
-            Log.Logger = new LoggerConfiguration()
-                    .MinimumLevel.Debug()
-                    .WriteTo.File($"{_config["Logging:Path"]} - {DateTime.Now.ToString("yyyyMMdd_HHmmss")}.txt",
-                        rollingInterval: RollingInterval.Day,
-                        restrictedToMinimumLevel: LogEventLevel.Debug,
-                        shared: true)
-                    .CreateLogger();
+            //Log.Logger = new LoggerConfiguration()
+            //        .MinimumLevel.Debug()
+            //        .WriteTo.File($"{_config["Logging:Path"]} - {DateTime.Now.ToString("yyyyMMdd_HHmmss")}.txt",
+            //            rollingInterval: RollingInterval.Day,
+            //            restrictedToMinimumLevel: LogEventLevel.Debug,
+            //            shared: true)
+            //        .CreateLogger();
 
             Log.Information("---HubSpotDealCreator Started---");
 
@@ -92,7 +92,7 @@ namespace HubSpotDealCreator
                 Log.Information("---HubSpotDealCreator Ended---");
 
                 // Close and flush the Serilog logger
-                Log.CloseAndFlush();                
+                //Log.CloseAndFlush();                
             }
         }
 
