@@ -23,20 +23,33 @@ namespace HubSpotDealCreator.Utilities
                     {
                         string responseBody = await response.Content.ReadAsStringAsync();
                         JArray ownersArray = JArray.Parse(responseBody);
+                        deal.SalesRepName = "";
+                        // Check if Deal.SalesRepName available, if so get the owner id
+                        if (!string.IsNullOrWhiteSpace(deal.SalesRepName))
+                        {
+                            var owner = ownersArray.FirstOrDefault(x => x["email"]?.ToString().Equals(deal.SalesRepName, StringComparison.OrdinalIgnoreCase) ==true);
+                            if (owner != null)
+                            {
+                                deal.OwnerId = owner["ownerId"]?.ToString();
+                                isSalesRepFound = true;
 
+                                return (deal, isSalesRepFound);
+                            }
+                        }                        
+                        // Check if Deal.SalesRepName is not available, check ownersArray against deal.Emails
                         foreach (var owner in ownersArray)
                         {
-                            string email = (string)owner["email"];
-                            string ownerId = (string)owner["ownerId"];
+                            string email = owner["email"]?.ToString();
+                            string ownerId = owner["ownerId"]?.ToString();
 
-                            if(deal.Emails.Any(x=>x.Equals(email,StringComparison.OrdinalIgnoreCase)))
+                            if (deal.Emails.Any(x => x.Equals(email, StringComparison.OrdinalIgnoreCase)))
                             {
                                 // Allocating the sales rep to the deal
                                 deal.OwnerId = ownerId;
                                 isSalesRepFound = true;
-                                break; // Exit the loop once a sales rep is found
+                                return (deal, isSalesRepFound);                                
                             }
-                        }
+                        }                        
                     }
                     else
                     {
@@ -51,9 +64,12 @@ namespace HubSpotDealCreator.Utilities
                 Log.Error(ex, "An error occurred while retrieving Sales Pro users");
             }
 
+            if(!isSalesRepFound)
+            {
+                deal.OrderNotes += "**************" + System.Environment.NewLine + "Could not locate the sales rep";
+            }
 
-
-            return (deal,isSalesRepFound);
+            return (deal, isSalesRepFound);
         }
     }
 }

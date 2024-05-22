@@ -9,13 +9,13 @@ namespace HubSpotDealCreator.Utilities
 {
     public static class UploadPurchaseOrder
     {
-        public static Deal UploadFile(Deal deal, IConfiguration config, string filePath)
+        public static Deal UploadFile(Deal deal, IConfiguration config)
         {
             string constructedFile = string.Empty;          
 
             try
             {               
-                string fileName = Path.GetFileName(filePath + @"\" + deal.FileName);
+                
 
                 // Check if deal.FileName is null
                 if (string.IsNullOrWhiteSpace(deal.FileName))
@@ -24,13 +24,13 @@ namespace HubSpotDealCreator.Utilities
                     return deal;
                 }
 
-                var file = File.ReadAllBytes(filePath + @"\" + fileName);
+                var file = File.ReadAllBytes(deal.FilePath);
                 var client = new RestClient("https://api.hubapi.com/");
                 var request = new RestRequest("/filemanager/api/v3/files/upload", Method.Post);
 
                 client.AddDefaultHeader("Authorization", string.Format("Bearer {0}", config["HubSpot-API:Key"]));
 
-                request.AddFile("file", file, fileName, "application/octet-stream");
+                request.AddFile("file", file, deal.FileName, "application/octet-stream");
                 request.AddParameter("folderPath", "/PO");
 
                 var fileOptions = new
