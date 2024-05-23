@@ -25,8 +25,8 @@ namespace HubSpotDealCreator.Utilities
                     {
                         var hubSpotProductsRepository = serviceProvider.GetRequiredService<IHubSpotProductRepository>();
                         var hubSpotProdRepoRes = await hubSpotProductsRepository.GetAllAsync();
-                        
-                        if(hubSpotProdRepoRes == null)
+
+                        if (hubSpotProdRepoRes == null || !hubSpotProdRepoRes.Any())
                         {
                             Log.Error($"Could not load HubSpot products");
 

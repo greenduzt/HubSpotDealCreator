@@ -17,15 +17,7 @@ namespace HubSpotDealCreator
         }
 
         public async Task CreateDealAsync(Deal deal)
-        {          
-            //Log.Logger = new LoggerConfiguration()
-            //        .MinimumLevel.Debug()
-            //        .WriteTo.File($"{_config["Logging:Path"]} - {DateTime.Now.ToString("yyyyMMdd_HHmmss")}.txt",
-            //            rollingInterval: RollingInterval.Day,
-            //            restrictedToMinimumLevel: LogEventLevel.Debug,
-            //            shared: true)
-            //        .CreateLogger();
-
+        { 
             Log.Information("---HubSpotDealCreator Started---");
 
             try
@@ -35,9 +27,9 @@ namespace HubSpotDealCreator
                     Log.Information("Deal object is empty");
                     return;
                 }
-                var services = ConfigureServices(_config);
-                using (var serviceProvider = services.BuildServiceProvider())
-                {   
+                //var services = ConfigureServices(_config);
+                //using (var serviceProvider = services.BuildServiceProvider())
+                //{   
 
                     // Creating handlers for checking company name, domain, and ABN
                     var companyNameHandler = new CompanyNameSearchHandler();
@@ -80,7 +72,7 @@ namespace HubSpotDealCreator
                         await salesRepHandler.Handle(deal, _config);
                     }
 
-                }
+                //}
             }
             catch (Exception ex)
             {
