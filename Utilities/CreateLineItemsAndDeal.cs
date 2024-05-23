@@ -5,13 +5,83 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
+using System.Security.Permissions;
 using System.Text;
+using System.Text.RegularExpressions;
 using Type = CoreLibrary.Models.Type;
 
 namespace HubSpotDealCreator.Utilities
 {
     public static class CreateLineItemsAndDeal
     {
+
+        public static HubSpotProduct ValidateLineItem(List<HubSpotProduct> hubSpotProductList, LineItems lineItem)
+        {
+            if(lineItem == null)
+            {
+                Log.Error("Lineitem not found!");
+                return null;
+            }
+            else if (string.IsNullOrWhiteSpace(lineItem.ExpenseRaw))
+            {
+                Log.Error("Expense row not found!");
+                return null;
+            }
+
+            string pattern = @"[^a-zA-Z0-9%]+";
+            var expenseRawWords = Regex.Replace(lineItem.ExpenseRaw, pattern, " ").Trim().ToLower();
+
+            var wordList = expenseRawWords.Split(' ').ToList();
+
+            foreach (var item in hubSpotProductList)
+            {               
+                if(item.SKU.ToLower().Equals("VIC Freight Launceston".ToLower()))
+                {
+
+                }
+                var prodSplitList = item.SKU.Split(' ').ToList();
+                if (prodSplitList.Any())
+                {
+                    int pCount = prodSplitList.Count(), c = 0,prev=0;
+                    for (int i = 0; i < prodSplitList.Count; i++)
+                    {
+                        if (pCount > 0)
+                        {
+                            int n = wordList.FindIndex(q => q.ToLower().Equals(prodSplitList[i].ToLower()));
+                            if (i == 0 && n == -1)
+                            {
+                                break;
+                            }
+
+                            if (n != -1)// Match found
+                            {
+                                c++;
+                                prev=n;
+
+                                if (pCount == c)
+                                {
+                                    if(pCount > 1 && c == (n + 1))
+                                    {
+                                        return item;
+                                    }       
+                                    else if (pCount == 1)
+                                    {
+                                        return item;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                c = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public static async Task<(Deal deal, bool isDealCreated)> CreateNewDeal(Deal deal, IConfiguration config)
         {
             bool isDealCreated = false;
@@ -25,6 +95,7 @@ namespace HubSpotDealCreator.Utilities
                     {
                         var hubSpotProductsRepository = serviceProvider.GetRequiredService<IHubSpotProductRepository>();
                         var hubSpotProdRepoRes = await hubSpotProductsRepository.GetAllAsync();
+                        string pattern = @"[^a-zA-Z0-9%]+";
 
                         if (hubSpotProdRepoRes == null || !hubSpotProdRepoRes.Any())
                         {
@@ -32,10 +103,12 @@ namespace HubSpotDealCreator.Utilities
 
                             return (deal,false);
                         }
+                        hubSpotProdRepoRes = hubSpotProdRepoRes.OrderBy(x=>x.SKU);                       
 
                         string apiUrl = "https://api.hubapi.com/crm/v3/objects/deals";
                         string lineItemsApiUrl = "https://api.hubapi.com/crm/v3/objects/line_items/batch/create";
 
+                        
                         // Set the authorization header with the API key
                         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {config["HubSpot-API:Key"]}");
 
@@ -47,21 +120,25 @@ namespace HubSpotDealCreator.Utilities
 
                         // Iterate through deal.LineItems and add each line item to the JSON
                         foreach (var lineItem in deal.LineItems)
-                        {
-                            string name = lineItem.Name.Replace("\n", "\\n").Replace("\r", "\\r").Trim();
-                            string description = lineItem.Name.Replace("\n", "\\n").Replace("\r", "\\r").Trim();
-                            string sku = lineItem.SKU.Replace("\n", "\\n").Replace("\r", "\\r").Trim();
-
+                        {                            
+                            // Validate the line items against hubspot line items
+                            HubSpotProduct hubSpotProdValidated = ValidateLineItem(hubSpotProdRepoRes.ToList(), lineItem) ?? new HubSpotProduct()
+                            {                             
+                                Name = $"Not Found-{CleanString(lineItem.Name, pattern)}",
+                                SKU = $"Not Found-{CleanString(lineItem.SKU, pattern)}",
+                                ProductDescription = $"Not Found-{CleanString(lineItem.Name, pattern)}"
+                            };                            
+                            
                             jsonBuilder.Append("{");
                             jsonBuilder.Append("\"properties\": {");
-                            jsonBuilder.Append($"\"name\": \"{name}\",");
-                            jsonBuilder.Append($"\"description\": \"{description}\",");
-                            jsonBuilder.Append($"\"hs_sku\": \"{sku}\",");
+                            jsonBuilder.Append($"\"name\": \"{hubSpotProdValidated.Name}\",");
+                            jsonBuilder.Append($"\"description\": \"{hubSpotProdValidated.ProductDescription}\",");
+                            jsonBuilder.Append($"\"hs_sku\": \"{hubSpotProdValidated.SKU}\",");
                             jsonBuilder.Append($"\"price\": \"{lineItem.UnitPrice}\",");
                             jsonBuilder.Append($"\"quantity\": \"{lineItem.Quantity}\"");
                             jsonBuilder.Append("}");
                             jsonBuilder.Append("},");
-                            lineItemsInfoBuilder.Append($"[Name : {lineItem.Name}|SKU : {lineItem.SKU}|Price : {lineItem.UnitPrice}|Quantity : {lineItem.Quantity}]");
+                            lineItemsInfoBuilder.Append($"[Name : {hubSpotProdValidated.Name}|SKU : {hubSpotProdValidated.SKU}|Price : {lineItem.UnitPrice}|Quantity : {lineItem.Quantity}]");
                         }
 
                         Log.Information($"Deal Line Items : {lineItemsInfoBuilder.ToString()}");
@@ -209,6 +286,11 @@ namespace HubSpotDealCreator.Utilities
             var services = new ServiceCollection();
             services.AddDataAccessServices(config); // Pass IConfiguration
             return services;
+        }
+
+        private static string CleanString(string input, string pattern)
+        {
+            return Regex.Replace(input,pattern, " ").Trim();
         }
     }
 }
