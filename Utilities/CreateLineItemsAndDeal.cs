@@ -14,7 +14,6 @@ namespace HubSpotDealCreator.Utilities
 {
     public static class CreateLineItemsAndDeal
     {
-
         public static HubSpotProduct ValidateLineItem(List<HubSpotProduct> hubSpotProductList, LineItems lineItem)
         {
             if(lineItem == null)
@@ -34,11 +33,7 @@ namespace HubSpotDealCreator.Utilities
             var wordList = expenseRawWords.Split(' ').ToList();
 
             foreach (var item in hubSpotProductList)
-            {               
-                if(item.SKU.ToLower().Equals("VIC Freight Launceston".ToLower()))
-                {
-
-                }
+            { 
                 var prodSplitList = item.SKU.Split(' ').ToList();
                 if (prodSplitList.Any())
                 {
@@ -47,33 +42,33 @@ namespace HubSpotDealCreator.Utilities
                     {
                         if (pCount > 0)
                         {
+                            c++;
+
                             int n = wordList.FindIndex(q => q.ToLower().Equals(prodSplitList[i].ToLower()));
-                            if (i == 0 && n == -1)
+                            if(n != -1)
                             {
-                                break;
-                            }
-
-                            if (n != -1)// Match found
-                            {
-                                c++;
-                                prev=n;
-
-                                if (pCount == c)
+                                if (pCount > 1)
                                 {
-                                    if(pCount > 1 && c == (n + 1))
+                                    if ((prev + 1) == n)
                                     {
-                                        return item;
-                                    }       
-                                    else if (pCount == 1)
+                                        if (pCount == c)
+                                        {
+                                            return item;
+                                        }
+
+                                    }
+                                }
+                                else
+                                {
+                                    if (pCount == c)
                                     {
                                         return item;
                                     }
                                 }
-                            }
-                            else
-                            {
-                                c = 0;
-                            }
+
+                                // If match found save the index to prev variable
+                                prev = n;
+                            }            
                         }
                     }
                 }

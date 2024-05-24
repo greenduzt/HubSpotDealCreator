@@ -45,7 +45,7 @@ class Program
             new LineItems 
             { 
                 SKU = "Charge Line", Name = "$50 per Pallet. (20 rolls per\npallet)", Quantity = 180, UnitPrice = 50.00m, NetPrice = 50.00m,
-                ExpenseRaw="9 24Kg Binder Procure 24Kg VIC Freight Launceston 24Kg Pail Procure Binder 10/03/2024 $187.20 $1,684.80"
+                ExpenseRaw="9 24Kg Binder Procure 24Kg sdsd 24Kg Pail Procure Binder 10/03/2024 $187.20 $1,684.80"
             } ,
              new LineItems
             {
