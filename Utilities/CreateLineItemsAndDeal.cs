@@ -21,7 +21,8 @@ namespace HubSpotDealCreator.Utilities
                 Log.Error("Lineitem not found!");
                 return null;
             }
-            else if (string.IsNullOrWhiteSpace(lineItem.ExpenseRaw))
+            
+            if (string.IsNullOrWhiteSpace(lineItem.ExpenseRaw))
             {
                 Log.Error("Expense row not found!");
                 return null;
@@ -29,7 +30,6 @@ namespace HubSpotDealCreator.Utilities
 
             string pattern = @"[^a-zA-Z0-9%]+";
             var expenseRawWords = Regex.Replace(lineItem.ExpenseRaw, pattern, " ").Trim().ToLower();
-
             var wordList = expenseRawWords.Split(' ').ToList();
 
             foreach (var item in hubSpotProductList)
@@ -44,18 +44,17 @@ namespace HubSpotDealCreator.Utilities
                         {
                             c++;
 
-                            int n = wordList.FindIndex(q => q.ToLower().Equals(prodSplitList[i].ToLower()));
-                            if(n != -1)
+                            int currentIndex = wordList.FindIndex(q => q.ToLower().Equals(prodSplitList[i].ToLower()));
+                            if(currentIndex != -1)
                             {
                                 if (pCount > 1)
                                 {
-                                    if ((prev + 1) == n)
+                                    if ((prev + 1) == currentIndex)
                                     {
                                         if (pCount == c)
                                         {
                                             return item;
                                         }
-
                                     }
                                 }
                                 else
@@ -67,7 +66,7 @@ namespace HubSpotDealCreator.Utilities
                                 }
 
                                 // If match found save the index to prev variable
-                                prev = n;
+                                prev = currentIndex;
                             }            
                         }
                     }
@@ -98,8 +97,7 @@ namespace HubSpotDealCreator.Utilities
 
                             return (deal,false);
                         }
-                        hubSpotProdRepoRes = hubSpotProdRepoRes.OrderBy(x=>x.SKU);                       
-
+                        
                         string apiUrl = "https://api.hubapi.com/crm/v3/objects/deals";
                         string lineItemsApiUrl = "https://api.hubapi.com/crm/v3/objects/line_items/batch/create";
 
@@ -119,9 +117,9 @@ namespace HubSpotDealCreator.Utilities
                             // Validate the line items against hubspot line items
                             HubSpotProduct hubSpotProdValidated = ValidateLineItem(hubSpotProdRepoRes.ToList(), lineItem) ?? new HubSpotProduct()
                             {                             
-                                Name = $"Not Found-{CleanString(lineItem.Name, pattern)}",
-                                SKU = $"Not Found-{CleanString(lineItem.SKU, pattern)}",
-                                ProductDescription = $"Not Found-{CleanString(lineItem.Name, pattern)}"
+                                Name = "Not Found",
+                                SKU = "Not Found",
+                                ProductDescription = "Not Found"
                             };                            
                             
                             jsonBuilder.Append("{");
@@ -283,8 +281,12 @@ namespace HubSpotDealCreator.Utilities
             return services;
         }
 
-        private static string CleanString(string input, string pattern)
+        private static string CleanString(string input, string pattern,string type)
         {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return "Not Found";
+            }
             return Regex.Replace(input,pattern, " ").Trim();
         }
     }

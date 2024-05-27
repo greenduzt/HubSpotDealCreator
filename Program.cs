@@ -6,12 +6,7 @@ using System.Text.RegularExpressions;
 class Program
 {
     public static async Task Main(string[] args)
-    {
-
-        var lineItem = new { ExpenseRaw = "Hello, World! This is a test.\nRemove special\n\rcharacters       & spaces!" };
-        string pattern = @"[^a-zA-Z0-9]+";
-        string cleanedString = Regex.Replace(lineItem.ExpenseRaw, pattern, " ").Trim();
-       
+    {      
 
         // Set up configuration
         IConfiguration config = Configure();
@@ -44,14 +39,19 @@ class Program
            
             new LineItems 
             { 
-                SKU = "Charge Line", Name = "$50 per Pallet. (20 rolls per\npallet)", Quantity = 180, UnitPrice = 50.00m, NetPrice = 50.00m,
-                ExpenseRaw="9 24Kg Binder Procure 24Kg sdsd 24Kg Pail Procure Binder 10/03/2024 $187.20 $1,684.80"
+                SKU = "14178", Name = "Kingaroy Lions Park\nWETPOUR RAW MATERIAL as per Estimate No:\n14178", Quantity = 1.0m, UnitPrice = 230.00M, NetPrice = 230.00M,
+                ExpenseRaw="Kingaroy Lions Park\nWETPOUR RAW MATERIAL as per Estimate No:\n1.00 14,687.20 10% 14,687.20\n14178"
             } ,
-             new LineItems
+            new LineItems
             {
-                SKU = "CF953-18",Name = "AM8505R 1.2X10MTRS = 12M2.\n20 ROLLS PER PALLET\nAM8505R",Quantity = 200.00m,UnitPrice = 105.00m,NetPrice = 105.00m,
-                ExpenseRaw = "2g 20 bagged Bag Rubber CSBR EMERALD GREEN \nEmerald Green 23/03/2024 $41.60 $832.00"
+                SKU = null,Name = "Freight - 7 X pallets of rubber to Kingaroy Lions\nPark tailgate offload\n-",Quantity = 7.00M,UnitPrice = 105.00m,NetPrice = 105.00m,
+                ExpenseRaw = "Freight - 7 X pallets of rubber to Kingaroy Lions\n7.00 230.00 10% 1,610.00\nPark tailgate offload\n-"
             }
+            //new LineItems
+            //{
+            //    SKU = "CF953-18",Name = "AM8505R 1.2X10MTRS = 12M2.\n20 ROLLS PER PALLET\nAM8505R",Quantity = 200.00m,UnitPrice = 105.00m,NetPrice = 105.00m,
+            //    ExpenseRaw = "9 24Kg Binder Procure 24Kg PC24 24Kg Pail Procure Binder 10/03/2024 $187.20 $1,684.80"
+            //}
            // new LineItems { SKU = "CF953-18",Name = "AM8505R 1.2X10MTRS = 12M2. 20 ROLLS PER PALLET AM8505R",Quantity = 200.00m,UnitPrice = 105.00M,NetPrice = 105.00M },
            // new LineItems { SKU = "Charge Line", Name = "$50 per Pallet. (20 rolls per pallet)", Quantity = 180, UnitPrice = 50.00m, NetPrice = 50.00m }        
         }
