@@ -8,7 +8,14 @@ namespace HubSpotDealCreator.Utilities
     public static class CheckHBCompanyName
     {
         public static async Task<(Deal,bool)> SearchCompanyName(Deal deal, IConfiguration config)
-        {  
+        {
+            bool isCompanyFound = false;
+
+            if (string.IsNullOrWhiteSpace(deal.Company.Name))
+            {
+                return (deal, isCompanyFound);
+            }
+
             using (HttpClient client = new HttpClient())
             {
                 string json = @"{
@@ -25,7 +32,7 @@ namespace HubSpotDealCreator.Utilities
                     ],
                     ""properties"": [""abn"",""name"",""domain"",""customer_type""]
                 }";
-                bool isCompanyFound = false;
+                
 
                 try
                 {

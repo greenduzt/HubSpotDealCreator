@@ -2,16 +2,23 @@
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace HubSpotDealCreator.Utilities
 {
     public static class CheckHBABN
     {
         public static async Task<(Deal,bool)> SearchABN(Deal deal, IConfiguration config)
-        {    
-
+        {
+            string pattern = @"[^a-zA-Z0-9]+";
             bool isABNFound = false;
 
+            if(string.IsNullOrWhiteSpace(deal.Company.ABN))
+            {
+                return (deal, false);
+            }
+
+            deal.Company.ABN = Regex.Replace(deal.Company.ABN, pattern, "").Trim();
             try
             {
                 string json = @"{

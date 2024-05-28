@@ -1,10 +1,7 @@
-﻿using CoreLibrary.Data;
-using CoreLibrary.Models;
+﻿using CoreLibrary.Models;
 using HubSpotDealCreator.Handlers;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Serilog.Events;
 
 namespace HubSpotDealCreator
 {

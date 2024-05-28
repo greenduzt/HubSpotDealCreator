@@ -16,6 +16,8 @@ namespace HubSpotDealCreator.Utilities
             {
                 using (HttpClient client = new HttpClient())
                 {
+                    deal.Company.CustomerType = "prepaid";
+
                     // Set the authorization header with the API key
                     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {config["HubSpot-API:Key"]}");
 
@@ -24,7 +26,8 @@ namespace HubSpotDealCreator.Utilities
                                                 ""properties"": {
                                                     ""name"": """ + deal.Company.Name + @""",
                                                     ""domain"": """ + deal.Company.Domain + @""",
-                                                    ""abn"" : """ + deal.Company.ABN + @"""
+                                                    ""abn"" : """ + deal.Company.ABN + @""",
+                                                    ""customer_type"" : """ + deal.Company.CustomerType + @"""
                                                 }
                                             }";
 

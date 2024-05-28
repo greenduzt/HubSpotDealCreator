@@ -9,8 +9,12 @@ namespace HubSpotDealCreator.Utilities
     {
         public static async Task<(Deal,bool)> SearchDomain(Deal deal, IConfiguration config)
         {
-
             bool isDomainFound = false;
+
+            if(string.IsNullOrWhiteSpace(deal.Company.Domain))
+            {
+                return (deal, isDomainFound);
+            }
 
             try 
             { 

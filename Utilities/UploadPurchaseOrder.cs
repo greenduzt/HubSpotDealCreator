@@ -14,9 +14,7 @@ namespace HubSpotDealCreator.Utilities
             string constructedFile = string.Empty;          
 
             try
-            {               
-                
-
+            {   
                 // Check if deal.FileName is null
                 if (string.IsNullOrWhiteSpace(deal.FileName))
                 {

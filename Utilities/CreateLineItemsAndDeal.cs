@@ -89,7 +89,6 @@ namespace HubSpotDealCreator.Utilities
                     {
                         var hubSpotProductsRepository = serviceProvider.GetRequiredService<IHubSpotProductRepository>();
                         var hubSpotProdRepoRes = await hubSpotProductsRepository.GetAllAsync();
-                        string pattern = @"[^a-zA-Z0-9%]+";
 
                         if (hubSpotProdRepoRes == null || !hubSpotProdRepoRes.Any())
                         {
@@ -207,7 +206,7 @@ namespace HubSpotDealCreator.Utilities
                                     shipping_state = deal.DeliveryAddress.State,
                                     shipping_country = deal.DeliveryAddress.Country,
                                     order_notes = deal.OrderNotes,
-                                    is_the_required_date_ = "",
+                                    is_the_required_date_ = "Flexible",
                                     site_contact_name = "",
                                     site_contact_phone = "",
                                     date_required = deal.DeliveryDate,
