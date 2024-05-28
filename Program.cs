@@ -34,6 +34,7 @@ class Program
         DealName = "Test Deal",
         FileName = "Purchase_Order_No_42363.pdf",
         Emails = new List<string> { "chamara@a1rubber.com", "leeanne@a1rubber.com", "alex@yahoo.com", "david@gmail.com" },
+        DeliveryDate = "3 Nov 2023",
         LineItems = new List<LineItems>() 
         {
            

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
+using System.Globalization;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -190,6 +191,32 @@ namespace HubSpotDealCreator.Utilities
                                 }
                                 }
                             });
+
+                            // Fixing the date of the Delivery Date
+                          
+                            string[] dateFormats =
+                            {
+                                "MM/dd/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "dd/MM/yyyy", "yyyy-MM-dd", "MM-dd-yyyy",
+                                "dd MMM yyyy", "MMM dd, yyyy", "yyyy.MM.dd", "dd.MM.yyyy", "dd/MMM/yyyy",
+                                "MM/dd/yy", "dd-MM-yy", "yy/MM/dd", "dd/MM/yy", "yy-MM-dd", "MM-dd-yy",
+                                "d MMM yyyy", "d-MMM-yyyy", "d MMMM yyyy", "d-MMMM-yyyy"
+                            };
+
+                            if (DateTime.TryParseExact(deal.DeliveryDate, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDateTime))
+                            {
+                                // Format the parsed DateTime object to the desired format
+                                string formattedDate = parsedDateTime.ToString("yyyy-MM-dd");
+                                deal.DeliveryDate = formattedDate;
+                            }
+                            else
+                            {
+                                Log.Error($"Undable to paese Delivery Date : {deal.DeliveryDate}");
+                            }
+
+                            // Fixing the deal name
+
+                            deal.DealName = $"TEST ORDER - {deal.Company.Name} - {deal.DealName}";
+
 
                             // Create the deal request
                             DealRequest dealRequest = new DealRequest
