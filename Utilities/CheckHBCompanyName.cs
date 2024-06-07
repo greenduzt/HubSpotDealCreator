@@ -30,7 +30,7 @@ namespace HubSpotDealCreator.Utilities
                             ]
                         }
                     ],
-                    ""properties"": [""abn"",""name"",""domain"",""customer_type""]
+                    ""properties"": [""abn"",""name"",""domain"",""customer_type"",""dopricer_discount_cat_acoustic_solutions"",""dopricer_discount_cat_animal_matting"",""dopricer_discount_cat_commercial_flooring"",""dopricer_discount_cat_impact_tiles"",""dopricer_discount_cat_industrial_and_general_matting"",""dopricer_discount_cat_olympact_and_ramp_edges"",""dopricer_discount_cat_recreational_systems"",""dopricer_discount_cat_sealants_and_adhesives"",""dopricer_discount_cat_sports_surfacing_systems_and_synthetic_grass""]
                 }";
                 
 
@@ -71,9 +71,20 @@ namespace HubSpotDealCreator.Utilities
                             deal.Company.Domain = result.properties.domain;
                             deal.Company.ABN = result.properties.abn;
                             deal.Company.CustomerType = result.properties.customer_type;
+                            deal.Company.Acoustic = result.properties.dopricer_discount_cat_acoustic_solutions;
+                            deal.Company.Animals = result.properties.dopricer_discount_cat_animal_matting;
+                            deal.Company.Commercial = result.properties.dopricer_discount_cat_commercial_flooring;
+                            deal.Company.Impact = result.properties.dopricer_discount_cat_impact_tiles;
+                            deal.Company.Industrial = result.properties.dopricer_discount_cat_industrial_and_general_matting;
+                            deal.Company.Olympact = result.properties.dopricer_discount_cat_olympact_and_ramp_edges;
+                            deal.Company.Recreational = result.properties.dopricer_discount_cat_recreational_systems;
+                            deal.Company.Sealants = result.properties.dopricer_discount_cat_sealants_and_adhesives;
+                            deal.Company.Sports = result.properties.dopricer_discount_cat_sports_surfacing_systems_and_synthetic_grass;
                             isCompanyFound = true;
 
-                            Log.Information($"Company details: ID: {deal.Company.CompanyID}, Name: {deal.Company.Name}, Domain: {deal.Company.Domain}, ABN: {deal.Company.ABN}, CustomerType: {deal.Company.CustomerType}");
+                            Log.Information($"Company details: ID: {deal.Company.CompanyID}, Name: {deal.Company.Name}, Domain: {deal.Company.Domain}, ABN: {deal.Company.ABN}, " +
+                                                                                        $"CustomerType: {deal.Company.CustomerType}, Acoustic: {deal.Company.Acoustic}, Animal: {deal.Company.Animals}, Commercial: {deal.Company.Commercial}," +
+                                                                                        $" Impact: {deal.Company.Impact}");
                         }
                         else
                         {

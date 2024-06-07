@@ -80,6 +80,13 @@ namespace HubSpotDealCreator.Utilities
         public static async Task<(Deal deal, bool isDealCreated)> CreateNewDeal(Deal deal, IConfiguration config)
         {
             bool isDealCreated = false;
+            string[] dateFormats =
+                            {
+                                "MM/dd/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "dd/MM/yyyy", "yyyy-MM-dd", "MM-dd-yyyy",
+                                "dd MMM yyyy", "MMM dd, yyyy", "yyyy.MM.dd", "dd.MM.yyyy", "dd/MMM/yyyy",
+                                "MM/dd/yy", "dd-MM-yy", "yy/MM/dd", "dd/MM/yy", "yy-MM-dd", "MM-dd-yy",
+                                "d MMM yyyy", "d-MMM-yyyy", "d MMMM yyyy", "d-MMMM-yyyy"
+                            };
 
             try
             {
@@ -127,7 +134,7 @@ namespace HubSpotDealCreator.Utilities
                             jsonBuilder.Append($"\"name\": \"{hubSpotProdValidated.Name}\",");
                             jsonBuilder.Append($"\"description\": \"{hubSpotProdValidated.ProductDescription}\",");
                             jsonBuilder.Append($"\"hs_sku\": \"{hubSpotProdValidated.SKU}\",");
-                            jsonBuilder.Append($"\"price\": \"{lineItem.UnitPrice}\",");
+                            jsonBuilder.Append($"\"price\": \"{hubSpotProdValidated.Price}\",");
                             jsonBuilder.Append($"\"quantity\": \"{lineItem.Quantity}\"");
                             jsonBuilder.Append("}");
                             jsonBuilder.Append("},");
@@ -193,15 +200,6 @@ namespace HubSpotDealCreator.Utilities
                             });
 
                             // Fixing the date of the Delivery Date
-                          
-                            string[] dateFormats =
-                            {
-                                "MM/dd/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "dd/MM/yyyy", "yyyy-MM-dd", "MM-dd-yyyy",
-                                "dd MMM yyyy", "MMM dd, yyyy", "yyyy.MM.dd", "dd.MM.yyyy", "dd/MMM/yyyy",
-                                "MM/dd/yy", "dd-MM-yy", "yy/MM/dd", "dd/MM/yy", "yy-MM-dd", "MM-dd-yy",
-                                "d MMM yyyy", "d-MMM-yyyy", "d MMMM yyyy", "d-MMMM-yyyy"
-                            };
-
                             if (DateTime.TryParseExact(deal.DeliveryDate, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDateTime))
                             {
                                 // Format the parsed DateTime object to the desired format
@@ -214,10 +212,8 @@ namespace HubSpotDealCreator.Utilities
                             }
 
                             // Fixing the deal name
-
-                            deal.DealName = $"TEST ORDER - {deal.Company.Name} - {deal.DealName}";
-
-
+                            deal.DealName = $"{deal.Company.Name} - {deal.DealName}";
+                                                        
                             // Create the deal request
                             DealRequest dealRequest = new DealRequest
                             {
@@ -227,7 +223,7 @@ namespace HubSpotDealCreator.Utilities
                                     amount = deal.Total,
                                     dealstage = "209611454",//"209611454-deal created 209611456-deal won",
                                     hubspot_owner_id = deal.OwnerId,
-                                    deal_shipping_address = deal.DeliveryAddress.StreetAddress,
+                                    deal_shipping_address = "",
                                     shipping_city = deal.DeliveryAddress.Suburb,
                                     shipping_post_code = deal.DeliveryAddress.PostCode,
                                     shipping_state = deal.DeliveryAddress.State,
@@ -315,5 +311,6 @@ namespace HubSpotDealCreator.Utilities
             }
             return Regex.Replace(input,pattern, " ").Trim();
         }
+        
     }
 }

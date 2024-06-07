@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Serilog;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace HubSpotDealCreator.Utilities
 {
@@ -16,7 +17,10 @@ namespace HubSpotDealCreator.Utilities
             {
                 using (HttpClient client = new HttpClient())
                 {
+                    string pattern = @"[^a-zA-Z0-9]+";
                     deal.Company.CustomerType = "prepaid";
+
+                    var formattedCompName = Regex.Replace(deal.Company.Name, pattern, " ").Trim();
 
                     // Set the authorization header with the API key
                     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {config["HubSpot-API:Key"]}");
@@ -24,7 +28,7 @@ namespace HubSpotDealCreator.Utilities
                     string jsonCompanyPayload = @"
                                             {
                                                 ""properties"": {
-                                                    ""name"": """ + deal.Company.Name + @""",
+                                                    ""name"": """ + formattedCompName + @""",
                                                     ""domain"": """ + deal.Company.Domain + @""",
                                                     ""abn"" : """ + deal.Company.ABN + @""",
                                                     ""customer_type"" : """ + deal.Company.CustomerType + @"""
