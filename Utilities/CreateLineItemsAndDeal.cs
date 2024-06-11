@@ -135,7 +135,7 @@ namespace HubSpotDealCreator.Utilities
                             jsonBuilder.Append($"\"description\": \"{hubSpotProdValidated.ProductDescription}\",");
                             jsonBuilder.Append($"\"hs_sku\": \"{hubSpotProdValidated.SKU}\",");
                             jsonBuilder.Append($"\"price\": \"{hubSpotProdValidated.Price}\",");
-                            jsonBuilder.Append($"\"quantity\": \"{lineItem.Quantity}\"");
+                            jsonBuilder.Append($"\"quantity\": \"{lineItem.Quantity}\"");//hs_discount_percentage
                             jsonBuilder.Append("}");
                             jsonBuilder.Append("},");
                             lineItemsInfoBuilder.Append($"[Name : {hubSpotProdValidated.Name}|SKU : {hubSpotProdValidated.SKU}|Price : {lineItem.UnitPrice}|Quantity : {lineItem.Quantity}]");
@@ -310,6 +310,11 @@ namespace HubSpotDealCreator.Utilities
                 return "Not Found";
             }
             return Regex.Replace(input,pattern, " ").Trim();
+        }
+
+        public static void CalculateDiscount()
+        {
+
         }
         
     }

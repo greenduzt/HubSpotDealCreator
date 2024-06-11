@@ -41,7 +41,7 @@ class Program
             new LineItems 
             { 
                 SKU = "14178", Name = "Kingaroy Lions Park\nWETPOUR RAW MATERIAL as per Estimate No:\n14178", Quantity = 1.0m, UnitPrice = 230.00M, NetPrice = 230.00M,
-                ExpenseRaw="Kingaroy Lions Park\nWETPOUR RAW MATERIAL as per Estimate No:\n1.00 14,687.20 10% 14,687.20\n14178"
+                ExpenseRaw = "9 24Kg Binder Procure 24Kg PC24 24Kg Pail Procure Binder 10/03/2024 $187.20 $1,684.80"
             } ,
             new LineItems
             {
