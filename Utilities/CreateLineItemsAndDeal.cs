@@ -135,7 +135,8 @@ namespace HubSpotDealCreator.Utilities
                             jsonBuilder.Append($"\"description\": \"{hubSpotProdValidated.ProductDescription}\",");
                             jsonBuilder.Append($"\"hs_sku\": \"{hubSpotProdValidated.SKU}\",");
                             jsonBuilder.Append($"\"price\": \"{hubSpotProdValidated.Price}\",");
-                            jsonBuilder.Append($"\"quantity\": \"{lineItem.Quantity}\"");//hs_discount_percentage
+                            jsonBuilder.Append($"\"quantity\": \"{lineItem.Quantity}\",");
+                            jsonBuilder.Append($"\"hs_discount_percentage\": \"{CalculateDiscount(deal, hubSpotProdValidated.ProductCategory)}\"");
                             jsonBuilder.Append("}");
                             jsonBuilder.Append("},");
                             lineItemsInfoBuilder.Append($"[Name : {hubSpotProdValidated.Name}|SKU : {hubSpotProdValidated.SKU}|Price : {lineItem.UnitPrice}|Quantity : {lineItem.Quantity}]");
@@ -312,9 +313,45 @@ namespace HubSpotDealCreator.Utilities
             return Regex.Replace(input,pattern, " ").Trim();
         }
 
-        public static void CalculateDiscount()
+        private static string CalculateDiscount(Deal deal, string category)
         {
+            string discount="0"; 
 
+            switch (category)
+            {
+                case "Commercial Flooring":
+                    discount = deal.Company.Commercial;
+                    break;
+                case "Acoustic Solutions": 
+                    discount = deal.Company.Acoustic;
+                    break;
+                case "Recreational Systems":
+                    discount = deal.Company.Recreational;
+                    break;
+                case "Olympact and Ramp Edges":
+                    discount = deal.Company.Olympact;
+                    break;
+                case "Industrial and General Matting":
+                    discount = deal.Company.Industrial;
+                    break;
+                case "Sports Surfacing Systems and Synthetic Grass":
+                    discount = deal.Company.Sports;
+                    break;
+                case "Impact Tiles":
+                    discount = deal.Company.Impact;
+                    break;
+                case "Sealants and adhesives":
+                    discount = deal.Company.Sealants;
+                    break;
+                case "Animal Matting":
+                    discount = deal.Company.Animals;
+                    break;
+                default :
+                    discount = "0";
+                    break;
+            }
+
+            return discount;
         }
         
     }

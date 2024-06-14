@@ -29,7 +29,7 @@ class Program
     // Prepare sample data
     static Deal PrepareDeal() => new Deal
     {
-        Company = new Company { ABN = "72091979789", Name = "chamara11", Domain = "" },
+        Company = new Company { ABN = "", Name = "Chamara Comp Ltd", Domain = "" },
         DeliveryAddress = new Address() { StreetAddress = "123 Street", State = "QLD", PostCode = "3111", Suburb = "Newland", Country = "Australia" },
         DealName = "Test Deal",
         FileName = "Purchase_Order_No_42363.pdf",
